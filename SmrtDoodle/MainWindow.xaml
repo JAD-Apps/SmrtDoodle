@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="SmrtDoodle.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SmrtDoodle"
+    xmlns:helpers="using:SmrtDoodle.Helpers"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="SmrtDoodle">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <Grid>
+        <Grid.Resources>
+            <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Menu Bar -->
+        <MenuBar Grid.Row="0">
+            <MenuBarItem Title="File">
+                <MenuFlyoutItem Text="New" Click="New_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="N"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Open..." Click="Open_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="O"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Save" Click="Save_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="S"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Save As..." Click="SaveAs_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control,Shift" Key="S"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Print..." Click="Print_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="P"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem x:Name="InsertIntoDocumentItem" Text="Insert into Document &amp; Close" Click="InsertIntoDocument_Click" Visibility="Collapsed"/>
+                <MenuFlyoutItem Text="Exit" Click="Exit_Click"/>
+            </MenuBarItem>
+            <MenuBarItem Title="Edit">
+                <MenuFlyoutItem x:Name="UndoMenuItem" Text="Undo" Click="Undo_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Z"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem x:Name="RedoMenuItem" Text="Redo" Click="Redo_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Y"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Cut" Click="Cut_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="X"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Copy" Click="Copy_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="C"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Paste" Click="Paste_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="V"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Select All" Click="SelectAll_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="A"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Clear Selection" Click="ClearSelection_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Escape"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Delete Selection" Click="DeleteSelection_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Delete"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Paste as New Image" Click="PasteAsNewImage_Click"/>
+            </MenuBarItem>
+            <MenuBarItem Title="Image">
+                <MenuFlyoutItem Text="Resize..." Click="Resize_Click"/>
+                <MenuFlyoutItem Text="Crop" Click="Crop_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Flip Horizontal" Click="FlipH_Click"/>
+                <MenuFlyoutItem Text="Flip Vertical" Click="FlipV_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Rotate 90°" Click="Rotate90_Click"/>
+                <MenuFlyoutItem Text="Rotate 180°" Click="Rotate180_Click"/>
+                <MenuFlyoutItem Text="Rotate 270°" Click="Rotate270_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Invert Colors" Click="InvertColors_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control,Shift" Key="I"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Canvas Properties..." Click="CanvasProperties_Click"/>
+            </MenuBarItem>
+            <MenuBarItem Title="View">
+                <ToggleMenuFlyoutItem x:Name="ShowGridToggle" Text="Show Grid" Click="ToggleGrid_Click"/>
+                <ToggleMenuFlyoutItem x:Name="ShowRulerToggle" Text="Show Ruler" Click="ToggleRuler_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Zoom In" Click="ZoomIn_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Add"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Zoom Out" Click="ZoomOut_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="Subtract"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Zoom to Fit" Click="ZoomFit_Click"/>
+                <MenuFlyoutItem Text="100%" Click="Zoom100_Click"/>
+            </MenuBarItem>
+            <MenuBarItem Title="Layers">
+                <MenuFlyoutItem Text="Add Layer" Click="AddLayer_Click"/>
+                <MenuFlyoutItem Text="Delete Layer" Click="DeleteLayer_Click"/>
+                <MenuFlyoutItem Text="Duplicate Layer" Click="DuplicateLayer_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Move Layer Up" Click="MoveLayerUp_Click"/>
+                <MenuFlyoutItem Text="Move Layer Down" Click="MoveLayerDown_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Merge Down" Click="MergeDown_Click"/>
+                <MenuFlyoutItem Text="Flatten Image" Click="FlattenImage_Click"/>
+            </MenuBarItem>
+        </MenuBar>
+
+        <!-- Toolbar -->
+        <Grid Grid.Row="1" Padding="4" ColumnSpacing="4" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Drawing Tools -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2">
+                <AppBarButton x:Name="BtnPencil" Label="Pencil" Click="Tool_Click" Tag="Pencil" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xED63;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnBrush" Label="Brush" Click="Tool_Click" Tag="Brush" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xE790;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnEraser" Label="Eraser" Click="Tool_Click" Tag="Eraser" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xE75C;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnFill" Label="Fill" Click="Tool_Click" Tag="Fill" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xE771;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnText" Label="Text" Click="Tool_Click" Tag="Text" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xE8D2;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnEyedropper" Label="Pick" Click="Tool_Click" Tag="Eyedropper" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xEF3C;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnLine" Label="Line" Click="Tool_Click" Tag="Line" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xE738;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnCurve" Label="Curve" Click="Tool_Click" Tag="Curve" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xE746;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnShape" Label="Shape" Click="Tool_Click" Tag="Shape" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xF158;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnSelect" Label="Select" Click="Tool_Click" Tag="Selection" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xE8B3;"/></AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton x:Name="BtnFreeSelect" Label="Lasso" Click="Tool_Click" Tag="FreeFormSelection" Width="48">
+                    <AppBarButton.Icon><FontIcon Glyph="&#xEF20;"/></AppBarButton.Icon>
+                </AppBarButton>
+            </StackPanel>
+
+            <AppBarSeparator Grid.Column="1"/>
+
+            <!-- Stroke & Shape Options -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="Size:" VerticalAlignment="Center"/>
+                <Slider x:Name="StrokeSizeSlider" Minimum="1" Maximum="50" Value="3" Width="120"
+                        VerticalAlignment="Center"/>
+                <TextBlock Text="Shape:" VerticalAlignment="Center"/>
+                <ComboBox x:Name="ShapeTypeCombo" SelectedIndex="0" Width="130" VerticalAlignment="Center"
+                          SelectionChanged="ShapeTypeCombo_SelectionChanged">
+                    <ComboBoxItem Content="Rectangle"/>
+                    <ComboBoxItem Content="Ellipse"/>
+                    <ComboBoxItem Content="Rounded Rect"/>
+                    <ComboBoxItem Content="Triangle"/>
+                    <ComboBoxItem Content="Right Triangle"/>
+                    <ComboBoxItem Content="Diamond"/>
+                    <ComboBoxItem Content="Pentagon"/>
+                    <ComboBoxItem Content="Hexagon"/>
+                    <ComboBoxItem Content="Arrow"/>
+                    <ComboBoxItem Content="Star"/>
+                    <ComboBoxItem Content="Heart"/>
+                    <ComboBoxItem Content="Lightning"/>
+                </ComboBox>
+                <TextBlock Text="Fill:" VerticalAlignment="Center"/>
+                <ComboBox x:Name="FillModeCombo" SelectedIndex="0" Width="120" VerticalAlignment="Center"
+                          SelectionChanged="FillModeCombo_SelectionChanged">
+                    <ComboBoxItem Content="Outline"/>
+                    <ComboBoxItem Content="Fill"/>
+                    <ComboBoxItem Content="Outline + Fill"/>
+                </ComboBox>
+            </StackPanel>
+
+            <AppBarSeparator Grid.Column="3"/>
+
+            <!-- Color Palette -->
+            <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                <Border x:Name="PrimaryColorBorder" Width="32" Height="32" CornerRadius="4"
+                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="2"
+                        Background="Black" Tapped="PrimaryColor_Tapped" ToolTipService.ToolTip="Primary Color"/>
+                <Border x:Name="SecondaryColorBorder" Width="32" Height="32" CornerRadius="4"
+                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="2"
+                        Background="White" Tapped="SecondaryColor_Tapped" ToolTipService.ToolTip="Secondary Color"/>
+                <GridView x:Name="ColorPaletteGrid" SelectionMode="Single" IsItemClickEnabled="True"
+                          ItemClick="ColorPalette_ItemClick" MaxHeight="64" VerticalAlignment="Center">
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid MaximumRowsOrColumns="2" Orientation="Horizontal" ItemWidth="20" ItemHeight="20"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{Binding}" Width="16" Height="16" CornerRadius="2"
+                                    BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="1"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+            </StackPanel>
+
+            <!-- Insert Button (SmrtPad mode) -->
+            <Button x:Name="InsertButton" Grid.Column="5" Content="Insert into Document"
+                    Click="InsertIntoDocument_Click" Visibility="Collapsed"
+                    Style="{ThemeResource AccentButtonStyle}" VerticalAlignment="Center" Margin="4,0"/>
+        </Grid>
+
+        <!-- Main Content Area -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Canvas Area with ScrollViewer -->
+            <ScrollViewer x:Name="CanvasScrollViewer" Grid.Column="0"
+                          HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                          ZoomMode="Disabled" Background="{ThemeResource SolidBackgroundFillColorQuarternaryBrush}">
+                <Grid x:Name="CanvasContainer" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                    <!-- Ruler overlay -->
+                    <canvas:CanvasControl x:Name="RulerCanvas" Draw="RulerCanvas_Draw"
+                                          IsHitTestVisible="False"
+                                          Visibility="Collapsed"/>
+
+                    <!-- Main drawing canvas -->
+                    <canvas:CanvasControl x:Name="DrawingCanvas"
+                                          Draw="DrawingCanvas_Draw"
+                                          CreateResources="DrawingCanvas_CreateResources"
+                                          PointerPressed="DrawingCanvas_PointerPressed"
+                                          PointerMoved="DrawingCanvas_PointerMoved"
+                                          PointerReleased="DrawingCanvas_PointerReleased"/>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- Layer Panel -->
+            <Grid Grid.Column="1" Width="200"
+                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Layers" FontWeight="SemiBold" Margin="8,8,8,4"/>
+                <ListView x:Name="LayerListView" Grid.Row="1" SelectionMode="Single"
+                          SelectionChanged="LayerList_SelectionChanged">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="4" ColumnSpacing="6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox IsChecked="{Binding IsVisible, Mode=TwoWay}" Grid.Column="0"
+                                          MinWidth="0" Padding="0" Click="LayerVisibility_Click"/>
+                                <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <FontIcon Glyph="&#xE72E;" Grid.Column="2" FontSize="12"
+                                          Visibility="{Binding IsLocked, Converter={StaticResource BoolToVisibility}}"
+                                          VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Padding="4">
+                    <Button Content="&#xE710;" FontFamily="Segoe MDL2 Assets" Click="AddLayer_Click"
+                            ToolTipService.ToolTip="Add Layer" Width="36" Height="36"/>
+                    <Button Content="&#xE74D;" FontFamily="Segoe MDL2 Assets" Click="DeleteLayer_Click"
+                            ToolTipService.ToolTip="Delete Layer" Width="36" Height="36"/>
+                    <Button Content="&#xE8C8;" FontFamily="Segoe MDL2 Assets" Click="DuplicateLayer_Click"
+                            ToolTipService.ToolTip="Duplicate" Width="36" Height="36"/>
+                    <Button Content="&#xE74A;" FontFamily="Segoe MDL2 Assets" Click="MoveLayerUp_Click"
+                            ToolTipService.ToolTip="Up" Width="36" Height="36"/>
+                    <Button Content="&#xE74B;" FontFamily="Segoe MDL2 Assets" Click="MoveLayerDown_Click"
+                            ToolTipService.ToolTip="Down" Width="36" Height="36"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Grid Grid.Row="3" Padding="6,2" ColumnSpacing="16"
+              Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="StatusPosition" Grid.Column="0" Text="0, 0 px" VerticalAlignment="Center" FontSize="12"/>
+            <TextBlock x:Name="StatusCanvasSize" Grid.Column="1" Text="800 x 600 px" VerticalAlignment="Center" FontSize="12"/>
+            <TextBlock x:Name="StatusTool" Grid.Column="2" Text="Pencil" VerticalAlignment="Center" FontSize="12"/>
+            <TextBlock x:Name="StatusSelection" Grid.Column="3" Text="" VerticalAlignment="Center" FontSize="12"/>
+            <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock x:Name="StatusZoom" Text="100%" VerticalAlignment="Center" FontSize="12"/>
+                <Slider x:Name="ZoomSlider" Minimum="10" Maximum="800" Value="100" Width="150"
+                        VerticalAlignment="Center" ValueChanged="ZoomSlider_ValueChanged"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
