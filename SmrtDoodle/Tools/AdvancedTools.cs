@@ -281,6 +281,17 @@ public class SelectionTool : ToolBase
     public Vector2 StartPoint { get; private set; }
     public SelectionMode Mode { get; set; } = SelectionMode.None;
     public CanvasRenderTarget? SelectionBitmap { get; set; }
+
+    /// <summary>
+    /// When true, the secondary color in the selection is treated as transparent during move/paste.
+    /// </summary>
+    public bool TransparentSelection { get; set; }
+
+    /// <summary>
+    /// The background color to treat as transparent when <see cref="TransparentSelection"/> is enabled.
+    /// </summary>
+    public Color TransparentColor { get; set; } = Color.FromArgb(255, 255, 255, 255);
+
     private Vector2 _moveOffset;
     private bool _hasLiftedPixels;
 
@@ -345,6 +356,12 @@ public class SelectionTool : ToolBase
                 SelectionRect);
         }
 
+        // Apply transparent selection: replace the background color with transparent
+        if (TransparentSelection)
+        {
+            ApplyTransparency(SelectionBitmap, TransparentColor);
+        }
+
         // Clear source area
         using (var ds = sourceBitmap.CreateDrawingSession())
         {
@@ -354,6 +371,23 @@ public class SelectionTool : ToolBase
         }
 
         _hasLiftedPixels = true;
+    }
+
+    private static void ApplyTransparency(CanvasRenderTarget bitmap, Color bgColor, int tolerance = 30)
+    {
+        var pixels = bitmap.GetPixelColors();
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            var c = pixels[i];
+            if (Math.Abs(c.R - bgColor.R) <= tolerance &&
+                Math.Abs(c.G - bgColor.G) <= tolerance &&
+                Math.Abs(c.B - bgColor.B) <= tolerance &&
+                c.A > 0)
+            {
+                pixels[i] = Color.FromArgb(0, 0, 0, 0);
+            }
+        }
+        bitmap.SetPixelColors(pixels);
     }
 
     /// <summary>

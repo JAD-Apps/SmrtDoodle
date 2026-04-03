@@ -13,7 +13,8 @@ public enum DrawingTool
     Shape,
     Selection,
     FreeFormSelection,
-    Crop
+    Crop,
+    Magnifier
 }
 
 public enum ShapeType
@@ -52,4 +53,16 @@ public enum ShapeFillMode
     Outline,
     Fill,
     OutlineAndFill
+}
+
+public enum BrushStyle
+{
+    Normal,
+    Calligraphy,
+    Airbrush,
+    Oil,
+    Crayon,
+    Marker,
+    NaturalPencil,
+    Watercolor
 }
