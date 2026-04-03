@@ -187,7 +187,6 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="16"/>
                     </Grid.RowDefinitions>
-                    <ItemsWrapGrid x:Name="ToolButtonPanel"/>
                     <StackPanel Grid.Row="0" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" Spacing="1">
                             <ToggleButton x:Name="BtnPencil" Click="Tool_Click" Tag="Pencil" Width="30" Height="30" Padding="0" CornerRadius="4"
@@ -404,11 +403,6 @@
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                           ZoomMode="Disabled" Background="{ThemeResource SolidBackgroundFillColorQuarternaryBrush}">
                 <Grid x:Name="CanvasContainer" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
-                    <!-- Ruler overlay -->
-                    <canvas:CanvasControl x:Name="RulerCanvas" Draw="RulerCanvas_Draw"
-                                          IsHitTestVisible="False"
-                                          Visibility="Collapsed"/>
-
                     <!-- Main drawing canvas -->
                     <canvas:CanvasControl x:Name="DrawingCanvas"
                                           Draw="DrawingCanvas_Draw"
@@ -416,6 +410,11 @@
                                           PointerPressed="DrawingCanvas_PointerPressed"
                                           PointerMoved="DrawingCanvas_PointerMoved"
                                           PointerReleased="DrawingCanvas_PointerReleased"/>
+
+                    <!-- Ruler overlay (on top of drawing canvas) -->
+                    <canvas:CanvasControl x:Name="RulerCanvas" Draw="RulerCanvas_Draw"
+                                          IsHitTestVisible="False"
+                                          Visibility="Collapsed"/>
                 </Grid>
             </ScrollViewer>
 
