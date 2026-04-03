@@ -42,8 +42,43 @@ Or press **F5** in Visual Studio with the packaging project set as the startup p
 
 ## Running Tests
 
+Unit tests run locally:
+
 ```
-dotnet test -p:Platform=x64
+dotnet test SmrtDoodle.Tests -p:Platform=x64
+```
+
+UI integration tests require a Windows remote test machine running [Appium](https://appium.io/) with the `appium-windows-driver` plugin. See **Remote UI Testing** below.
+
+## Remote UI Testing
+
+`SmrtDoodle.UITests` is an MSTest project that drives the app on a remote machine via WinRM + Appium.
+
+### Prerequisites
+
+- Remote machine running Windows 10/11 with .NET 8 and Windows App SDK 1.8 installed
+- Appium 3.x + `appium-windows-driver` running on port 4723 on the remote machine
+- WinRM enabled on the remote machine (`winrm quickconfig`)
+
+### Setup
+
+Create a `.env` file in the solution root (never committed — already in `.gitignore`):
+
+```
+UITEST_REMOTE_HOST=192.168.0.x
+UITEST_REMOTE_WINRM_USERNAME=YourUser
+UITEST_REMOTE_WINRM_PASSWORD=YourPassword
+UITEST_DEPLOY_CONFIGURATION=Debug
+```
+
+### Deploy and Run
+
+```powershell
+# Deploy the Debug build to the remote machine
+.\SmrtDoodle.UITests\Scripts\Deploy-Remote.ps1 -UseBuildOutput
+
+# Run UI tests (tests connect to the already-deployed app)
+dotnet test SmrtDoodle.UITests -p:Platform=x64
 ```
 
 ## Project Structure
@@ -54,14 +89,25 @@ SmrtDoodle/
 ├── Services/        # App services (FileService, ClipboardService, IpcService)
 ├── Tools/           # Drawing tool implementations (ITool, BasicTools, AdvancedTools, CurveTool, FreeFormSelectionTool)
 ├── Helpers/         # Converters and image utilities (FloodFill)
+├── Program.cs       # Custom WinUI 3 entry point (Bootstrap.Initialize / Shutdown)
 ├── MainWindow.xaml  # Main application window
 └── App.xaml         # Application entry point
 
-SmrtDoodle.Tests/
-├── Models/          # Model and enum tests
-├── Services/        # IPC service tests
-├── Tools/           # Tool tests
-└── Helpers/         # Converter tests
+SmrtDoodle.UITests/
+├── Scripts/         # Deploy-Remote.ps1 — builds and copies to remote test machine via PS Remoting
+├── AppiumTestBase.cs         # Base class: Appium session management, element helpers, drag/shortcut utilities
+├── BrushControlTests.cs      # Brush style, size, and rendering tests
+├── CanvasInteractionTests.cs # Pencil and brush drawing on canvas
+├── ColorControlTests.cs      # Color palette and swatch interaction
+├── ContextMenuTests.cs       # Right-click context menus
+├── LayerPanelTests.cs        # Layer visibility, opacity, and blend mode controls
+├── MenuBarTests.cs           # File/Edit/View/Image/Help menus
+├── SelectionAndClipboardTests.cs # Selection tools, copy, cut, paste
+├── ShapeControlTests.cs      # Shape type and fill mode controls
+├── StatusBarTests.cs         # Status bar display
+├── ToolButtonTests.cs        # Ribbon tool button activation
+├── EdgeCaseAndStressTests.cs # Rapid input and stress scenarios
+└── ViewToggleAndZoomTests.cs # Zoom, grid, and ruler toggles
 
 SmrtDoodle (Package)/ # MSIX packaging project
 ```

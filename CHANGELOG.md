@@ -4,6 +4,28 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Comprehensive UI integration test suite (`SmrtDoodle.UITests`) using Appium / WinAppDriver targeting a remote Windows test machine via WinRM — covers brush controls, canvas interaction, color controls, context menus, layer panel, menu bar, selection/clipboard, shapes, status bar, tool buttons, view/zoom toggles, and edge-case/stress scenarios
+- `Deploy-Remote.ps1` script for automated build and remote deployment over PS Remoting; reads credentials from a `.env` file (not committed) or environment variables; supports `-UseBuildOutput` flag to deploy Debug build output instead of a self-contained publish
+- `Program.cs` custom WinUI 3 entry point with explicit `Bootstrap.Initialize` / `Bootstrap.Shutdown` calls for reliable unpackaged-app startup
+
+### Changed
+
+- All brush and pencil rendering modes now stamp **filled** shapes (circles or ellipses) along the stroke path — eliminates the outline-stroke artifact where a black centre line was visible through semi-transparent brush colours:
+  - **Normal / Oil / Marker / Watercolor** — filled circle stamps via `StampFilledCircles` helper
+  - **Calligraphy** — filled ellipse stamps at −45° (major × minor axes proportional to stroke width)
+  - **Airbrush / Crayon / Natural Pencil** — already filled; stamp parameters tightened
+  - **Pencil** — `DrawFilledStroke` stamps filled circles along the movement vector
+- Disabled Windows App SDK auto-initializers (`WindowsAppSdkBootstrapInitialize`, `WindowsAppSdkDeploymentManagerInitialize`, `WindowsAppSdkUndockedRegFreeWinRTInitialize`) to prevent `TypeInitializationException` during unpackaged startup; initialisation is now done explicitly in `Program.cs`
+
+### Fixed
+
+- `TypeInitializationException` at app launch caused by Windows App SDK auto-initializers conflicting with the unpackaged bootstrap path
+- Brush/pencil strokes showing a black outline or centre line through semi-transparent fills
+
 ## [0.2.0] - 2026-07-16
 
 ### Added

@@ -78,3 +78,8 @@ node_modules/
 
 # WAP project caches
 *.assets.cache
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
