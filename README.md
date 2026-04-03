@@ -6,18 +6,21 @@ SmrtDoodle provides a familiar, intuitive canvas for quick sketches, diagrams, a
 
 ## Features
 
+- **Ribbon Toolbar** — SmrtPad-style grouped ribbon with Tools, Brush, Shapes, Selection, and Colors groups; fits at default window size without overflow
 - **Drawing Tools** — Pencil, Brush, Eraser, Line, Curve, and Shape tools with configurable stroke width and colors
+- **Brush Styles** — Normal, Calligraphy, Airbrush, Oil, Crayon, Marker, Natural Pencil, and Watercolor
 - **Shape Library** — Rectangle, Ellipse, Triangle, Star, Arrow, Heart, Lightning, and more with outline, fill, or combined modes
 - **Layers** — Multiple layers with visibility toggle, opacity control, blend modes, and duplication
-- **Selection** — Rectangular and free-form selection with move support
+- **Selection** — Rectangular and free-form selection with move support and transparent selection mode
 - **Flood Fill** — Tolerance-based fill tool for quick coloring
 - **Text Tool** — Add text directly to the canvas
 - **Eyedropper** — Pick colors from the canvas
+- **Magnifier** — Left-click to zoom in, right-click to zoom out
 - **Undo / Redo** — Full bitmap-level undo/redo history (up to 50 steps)
-- **Clipboard** — Copy, cut, and paste image data
+- **Clipboard** — Copy, cut, paste, paste from file, and paste as new image
 - **File I/O** — Open and save images in PNG, JPEG, BMP, and GIF formats
 - **Canvas Settings** — Configurable width, height, DPI, background color, grid, and ruler
-- **Color Palette** — 30-color palette with primary/secondary color support
+- **Color Palette** — 28-color MS Paint-standard palette with primary/secondary color swatches and swap button
 - **Zoom** — Zoom in and out with checkerboard transparency preview
 - **SmrtPad Integration** — Launch from [SmrtPad](https://github.com/John-Donnelly/SmrtPad) to insert drawings directly into documents via IPC
 
