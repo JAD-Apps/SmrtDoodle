@@ -224,7 +224,8 @@ public class ToolTests
             new ShapeTool(),
             new SelectionTool(),
             new CurveTool(),
-            new FreeFormSelectionTool()
+            new FreeFormSelectionTool(),
+            new MagnifierTool()
         };
 
         foreach (var tool in tools)

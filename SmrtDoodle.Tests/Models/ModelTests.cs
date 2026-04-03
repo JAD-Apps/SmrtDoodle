@@ -68,6 +68,7 @@ public class EnumTests
         Assert.IsTrue(values.Contains(DrawingTool.Selection));
         Assert.IsTrue(values.Contains(DrawingTool.FreeFormSelection));
         Assert.IsTrue(values.Contains(DrawingTool.Crop));
+        Assert.IsTrue(values.Contains(DrawingTool.Magnifier));
     }
 
     [TestMethod]
@@ -107,5 +108,20 @@ public class EnumTests
     {
         var values = Enum.GetValues<BlendMode>();
         Assert.AreEqual(4, values.Length);
+    }
+
+    [TestMethod]
+    public void BrushStyle_HasAllExpectedValues()
+    {
+        var values = Enum.GetValues<BrushStyle>();
+        Assert.AreEqual(8, values.Length);
+        Assert.AreEqual(0, (int)BrushStyle.Normal);
+        Assert.AreEqual(1, (int)BrushStyle.Calligraphy);
+        Assert.AreEqual(2, (int)BrushStyle.Airbrush);
+        Assert.AreEqual(3, (int)BrushStyle.Oil);
+        Assert.AreEqual(4, (int)BrushStyle.Crayon);
+        Assert.AreEqual(5, (int)BrushStyle.Marker);
+        Assert.AreEqual(6, (int)BrushStyle.NaturalPencil);
+        Assert.AreEqual(7, (int)BrushStyle.Watercolor);
     }
 }
