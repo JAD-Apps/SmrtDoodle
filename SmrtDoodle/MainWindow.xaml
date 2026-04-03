@@ -104,6 +104,7 @@
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
                 <MenuFlyoutItem Text="Paste as New Image" Click="PasteAsNewImage_Click"/>
+                <MenuFlyoutItem Text="Paste From File..." Click="PasteFromFile_Click"/>
             </MenuBarItem>
             <MenuBarItem Title="Image">
                 <MenuFlyoutItem Text="Resize..." Click="Resize_Click"/>
@@ -119,6 +120,11 @@
                 <MenuFlyoutItem Text="Invert Colors" Click="InvertColors_Click">
                     <MenuFlyoutItem.KeyboardAccelerators>
                         <KeyboardAccelerator Modifiers="Control,Shift" Key="I"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="Clear Image" Click="ClearImage_Click">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control,Shift" Key="N"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
@@ -154,118 +160,237 @@
             </MenuBarItem>
         </MenuBar>
 
-        <!-- Toolbar -->
-        <Grid Grid.Row="1" Padding="4" ColumnSpacing="4" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!-- ═══ RIBBON ═══ -->
+        <Border x:Name="RibbonBar" Grid.Row="1"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="4"
+                Height="100">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>  <!-- Tools -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Sep -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Brush -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Sep -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Shapes -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Sep -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Selection -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Sep -->
+                    <ColumnDefinition Width="*"/>     <!-- Colors -->
+                    <ColumnDefinition Width="Auto"/>  <!-- Insert -->
+                </Grid.ColumnDefinitions>
 
-            <!-- Drawing Tools -->
-            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="2">
-                <AppBarButton x:Name="BtnPencil" Label="Pencil" Click="Tool_Click" Tag="Pencil" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xED63;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnBrush" Label="Brush" Click="Tool_Click" Tag="Brush" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xE790;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnEraser" Label="Eraser" Click="Tool_Click" Tag="Eraser" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xE75C;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnFill" Label="Fill" Click="Tool_Click" Tag="Fill" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xE771;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnText" Label="Text" Click="Tool_Click" Tag="Text" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xE8D2;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnEyedropper" Label="Pick" Click="Tool_Click" Tag="Eyedropper" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xEF3C;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnLine" Label="Line" Click="Tool_Click" Tag="Line" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xE738;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnCurve" Label="Curve" Click="Tool_Click" Tag="Curve" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xE746;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnShape" Label="Shape" Click="Tool_Click" Tag="Shape" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xF158;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnSelect" Label="Select" Click="Tool_Click" Tag="Selection" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xE8B3;"/></AppBarButton.Icon>
-                </AppBarButton>
-                <AppBarButton x:Name="BtnFreeSelect" Label="Lasso" Click="Tool_Click" Tag="FreeFormSelection" Width="48">
-                    <AppBarButton.Icon><FontIcon Glyph="&#xEF20;"/></AppBarButton.Icon>
-                </AppBarButton>
-            </StackPanel>
+                <!-- ══ TOOLS ══ -->
+                <Grid Grid.Column="0" Padding="4,2,4,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="16"/>
+                    </Grid.RowDefinitions>
+                    <ItemsWrapGrid x:Name="ToolButtonPanel"/>
+                    <StackPanel Grid.Row="0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="1">
+                            <ToggleButton x:Name="BtnPencil" Click="Tool_Click" Tag="Pencil" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Pencil">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xED63;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnBrush" Click="Tool_Click" Tag="Brush" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Brush">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE790;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnEraser" Click="Tool_Click" Tag="Eraser" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Eraser">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE75C;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnFill" Click="Tool_Click" Tag="Fill" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fill">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE771;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnText" Click="Tool_Click" Tag="Text" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Text">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8D2;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnEyedropper" Click="Tool_Click" Tag="Eyedropper" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Color Picker">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEF3C;" FontSize="14"/>
+                            </ToggleButton>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="1">
+                            <ToggleButton x:Name="BtnLine" Click="Tool_Click" Tag="Line" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Line">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE738;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnCurve" Click="Tool_Click" Tag="Curve" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Curve">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE746;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnShape" Click="Tool_Click" Tag="Shape" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Shape">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF158;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnSelect" Click="Tool_Click" Tag="Selection" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Select">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8B3;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnFreeSelect" Click="Tool_Click" Tag="FreeFormSelection" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Free-form Select">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEF20;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnMagnifier" Click="Tool_Click" Tag="Magnifier" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Magnifier">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71E;" FontSize="14"/>
+                            </ToggleButton>
+                        </StackPanel>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Text="Tools" FontSize="10" HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </Grid>
 
-            <AppBarSeparator Grid.Column="1"/>
+                <Rectangle Grid.Column="1" Width="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,6" VerticalAlignment="Stretch"/>
 
-            <!-- Stroke & Shape Options -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <TextBlock Text="Size:" VerticalAlignment="Center"/>
-                <Slider x:Name="StrokeSizeSlider" Minimum="1" Maximum="50" Value="3" Width="120"
-                        VerticalAlignment="Center"/>
-                <TextBlock Text="Shape:" VerticalAlignment="Center"/>
-                <ComboBox x:Name="ShapeTypeCombo" SelectedIndex="0" Width="130" VerticalAlignment="Center"
-                          SelectionChanged="ShapeTypeCombo_SelectionChanged">
-                    <ComboBoxItem Content="Rectangle"/>
-                    <ComboBoxItem Content="Ellipse"/>
-                    <ComboBoxItem Content="Rounded Rect"/>
-                    <ComboBoxItem Content="Triangle"/>
-                    <ComboBoxItem Content="Right Triangle"/>
-                    <ComboBoxItem Content="Diamond"/>
-                    <ComboBoxItem Content="Pentagon"/>
-                    <ComboBoxItem Content="Hexagon"/>
-                    <ComboBoxItem Content="Arrow"/>
-                    <ComboBoxItem Content="Star"/>
-                    <ComboBoxItem Content="Heart"/>
-                    <ComboBoxItem Content="Lightning"/>
-                </ComboBox>
-                <TextBlock Text="Fill:" VerticalAlignment="Center"/>
-                <ComboBox x:Name="FillModeCombo" SelectedIndex="0" Width="120" VerticalAlignment="Center"
-                          SelectionChanged="FillModeCombo_SelectionChanged">
-                    <ComboBoxItem Content="Outline"/>
-                    <ComboBoxItem Content="Fill"/>
-                    <ComboBoxItem Content="Outline + Fill"/>
-                </ComboBox>
-            </StackPanel>
+                <!-- ══ BRUSH ══ -->
+                <Grid Grid.Column="2" Padding="6,4,6,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="4" Margin="0,0,0,4">
+                        <TextBlock Text="Size" FontSize="11" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <Slider x:Name="StrokeSizeSlider" Minimum="1" Maximum="50" Value="3" Width="90"
+                                VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="Style" FontSize="11" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                        <ComboBox x:Name="BrushStyleCombo" SelectedIndex="0" Width="110" Height="30" VerticalAlignment="Center"
+                                  SelectionChanged="BrushStyleCombo_SelectionChanged" FontSize="12">
+                            <ComboBoxItem Content="Normal"/>
+                            <ComboBoxItem Content="Calligraphy"/>
+                            <ComboBoxItem Content="Airbrush"/>
+                            <ComboBoxItem Content="Oil"/>
+                            <ComboBoxItem Content="Crayon"/>
+                            <ComboBoxItem Content="Marker"/>
+                            <ComboBoxItem Content="Natural Pencil"/>
+                            <ComboBoxItem Content="Watercolor"/>
+                        </ComboBox>
+                    </StackPanel>
+                    <TextBlock Grid.Row="2" Text="Brush" FontSize="10" HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </Grid>
 
-            <AppBarSeparator Grid.Column="3"/>
+                <Rectangle Grid.Column="3" Width="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,6" VerticalAlignment="Stretch"/>
 
-            <!-- Color Palette -->
-            <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                <Border x:Name="PrimaryColorBorder" Width="32" Height="32" CornerRadius="4"
-                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="2"
-                        Background="Black" Tapped="PrimaryColor_Tapped" ToolTipService.ToolTip="Primary Color"/>
-                <Border x:Name="SecondaryColorBorder" Width="32" Height="32" CornerRadius="4"
-                        BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="2"
-                        Background="White" Tapped="SecondaryColor_Tapped" ToolTipService.ToolTip="Secondary Color"/>
-                <GridView x:Name="ColorPaletteGrid" SelectionMode="Single" IsItemClickEnabled="True"
-                          ItemClick="ColorPalette_ItemClick" MaxHeight="64" VerticalAlignment="Center">
-                    <GridView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <ItemsWrapGrid MaximumRowsOrColumns="2" Orientation="Horizontal" ItemWidth="20" ItemHeight="20"/>
-                        </ItemsPanelTemplate>
-                    </GridView.ItemsPanel>
-                    <GridView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="{Binding}" Width="16" Height="16" CornerRadius="2"
-                                    BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="1"/>
-                        </DataTemplate>
-                    </GridView.ItemTemplate>
-                </GridView>
-            </StackPanel>
+                <!-- ══ SHAPES ══ -->
+                <Grid Grid.Column="4" Padding="6,4,6,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                    </Grid.RowDefinitions>
+                    <ComboBox x:Name="ShapeTypeCombo" Grid.Row="0" SelectedIndex="0" Width="130" Height="30" VerticalAlignment="Center"
+                              SelectionChanged="ShapeTypeCombo_SelectionChanged" FontSize="12" Margin="0,0,0,4">
+                        <ComboBoxItem Content="Rectangle"/>
+                        <ComboBoxItem Content="Ellipse"/>
+                        <ComboBoxItem Content="Rounded Rect"/>
+                        <ComboBoxItem Content="Triangle"/>
+                        <ComboBoxItem Content="Right Triangle"/>
+                        <ComboBoxItem Content="Diamond"/>
+                        <ComboBoxItem Content="Pentagon"/>
+                        <ComboBoxItem Content="Hexagon"/>
+                        <ComboBoxItem Content="Arrow"/>
+                        <ComboBoxItem Content="Star"/>
+                        <ComboBoxItem Content="Heart"/>
+                        <ComboBoxItem Content="Lightning"/>
+                    </ComboBox>
+                    <ComboBox x:Name="FillModeCombo" Grid.Row="1" SelectedIndex="0" Width="130" Height="30" VerticalAlignment="Center"
+                              SelectionChanged="FillModeCombo_SelectionChanged" FontSize="12">
+                        <ComboBoxItem Content="Outline"/>
+                        <ComboBoxItem Content="Fill"/>
+                        <ComboBoxItem Content="Outline + Fill"/>
+                    </ComboBox>
+                    <TextBlock Grid.Row="2" Text="Shapes" FontSize="10" HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </Grid>
 
-            <!-- Insert Button (SmrtPad mode) -->
-            <Button x:Name="InsertButton" Grid.Column="5" Content="Insert into Document"
-                    Click="InsertIntoDocument_Click" Visibility="Collapsed"
-                    Style="{ThemeResource AccentButtonStyle}" VerticalAlignment="Center" Margin="4,0"/>
-        </Grid>
+                <Rectangle Grid.Column="5" Width="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,6" VerticalAlignment="Stretch"/>
+
+                <!-- ══ SELECTION ══ -->
+                <Grid Grid.Column="6" Padding="6,4,6,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="16"/>
+                    </Grid.RowDefinitions>
+                    <CheckBox x:Name="TransparentSelectionCheck" Grid.Row="0" Content="Transparent" VerticalAlignment="Center"
+                              ToolTipService.ToolTip="Transparent selection (removes background color)"
+                              Click="TransparentSelection_Click" FontSize="12"/>
+                    <TextBlock Grid.Row="1" Text="Selection" FontSize="10" HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </Grid>
+
+                <Rectangle Grid.Column="7" Width="1" Fill="{ThemeResource DividerStrokeColorDefaultBrush}" Margin="0,6" VerticalAlignment="Stretch"/>
+
+                <!-- ══ COLORS ══ -->
+                <Grid Grid.Column="8" Padding="6,2,6,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="16"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <!-- Primary / Secondary overlapping swatches -->
+                        <Grid Width="36" Height="36" VerticalAlignment="Center">
+                            <Border x:Name="SecondaryColorBorder" Width="22" Height="22" CornerRadius="3"
+                                    BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="2"
+                                    Background="White" Tapped="SecondaryColor_Tapped" ToolTipService.ToolTip="Secondary Color (right-click)"
+                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                            <Border x:Name="PrimaryColorBorder" Width="22" Height="22" CornerRadius="3"
+                                    BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="2"
+                                    Background="Black" Tapped="PrimaryColor_Tapped" ToolTipService.ToolTip="Primary Color (left-click)"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                        </Grid>
+                        <!-- Swap button -->
+                        <Button x:Name="SwapColorsButton" Click="SwapColors_Click" ToolTipService.ToolTip="Swap Colors"
+                                Width="26" Height="26" Padding="0" VerticalAlignment="Center"
+                                Background="Transparent" BorderThickness="0" CornerRadius="4">
+                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8AB;" FontSize="12"/>
+                        </Button>
+                        <!-- Palette grid -->
+                        <GridView x:Name="ColorPaletteGrid" SelectionMode="None" IsItemClickEnabled="True"
+                                  ItemClick="ColorPalette_ItemClick" VerticalAlignment="Center"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                  ScrollViewer.HorizontalScrollMode="Disabled"
+                                  ScrollViewer.VerticalScrollMode="Disabled">
+                            <GridView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsWrapGrid MaximumRowsOrColumns="2" Orientation="Vertical" ItemWidth="22" ItemHeight="22"/>
+                                </ItemsPanelTemplate>
+                            </GridView.ItemsPanel>
+                            <GridView.ItemContainerStyle>
+                                <Style TargetType="GridViewItem">
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="MinWidth" Value="0"/>
+                                    <Setter Property="MinHeight" Value="0"/>
+                                </Style>
+                            </GridView.ItemContainerStyle>
+                            <GridView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{Binding}" Width="18" Height="18" CornerRadius="2"
+                                            BorderBrush="{ThemeResource SystemControlForegroundBaseMediumBrush}" BorderThickness="1"/>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                        </GridView>
+                    </StackPanel>
+                    <TextBlock Grid.Row="1" Text="Colors" FontSize="10" HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </Grid>
+
+                <!-- Insert Button (SmrtPad mode) -->
+                <Button x:Name="InsertButton" Grid.Column="9" Content="Insert into Document"
+                        Click="InsertIntoDocument_Click" Visibility="Collapsed"
+                        Style="{ThemeResource AccentButtonStyle}" VerticalAlignment="Center" Margin="4,0"/>
+            </Grid>
+        </Border>
 
         <!-- Main Content Area -->
         <Grid Grid.Row="2">

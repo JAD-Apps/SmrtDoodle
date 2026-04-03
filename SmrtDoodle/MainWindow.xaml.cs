@@ -7,6 +7,7 @@ using Microsoft.UI;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using SmrtDoodle.Helpers;
@@ -101,22 +102,46 @@ public sealed partial class MainWindow : Window
         _tools[DrawingTool.Shape] = new ShapeTool();
         _tools[DrawingTool.Selection] = new SelectionTool();
         _tools[DrawingTool.FreeFormSelection] = new FreeFormSelectionTool();
+        _tools[DrawingTool.Magnifier] = new MagnifierTool();
         HighlightActiveTool();
     }
 
     private void InitializeColorPalette()
     {
+        // MS Paint standard palette: Row 1 (dark/primary), Row 2 (light/secondary)
         var colors = new[]
         {
-            Colors.Black, Colors.White, Colors.Gray, Colors.DarkRed, Colors.Red, Colors.Orange,
-            Colors.Yellow, Colors.Green, Colors.DarkGreen, Colors.Cyan, Colors.Blue, Colors.DarkBlue,
-            Colors.Purple, Colors.Magenta, Colors.Pink, Colors.Brown,
-            Color.FromArgb(255,192,192,192), Color.FromArgb(255,128,0,0), Color.FromArgb(255,0,128,0),
-            Color.FromArgb(255,0,0,128), Color.FromArgb(255,128,128,0), Color.FromArgb(255,0,128,128),
-            Color.FromArgb(255,128,0,128), Color.FromArgb(255,255,128,0),
-            Color.FromArgb(255,0,255,128), Color.FromArgb(255,128,0,255),
-            Color.FromArgb(255,255,200,200), Color.FromArgb(255,200,255,200),
-            Color.FromArgb(255,200,200,255), Color.FromArgb(255,255,255,200)
+            // Row 1 (top)
+            Color.FromArgb(255, 0, 0, 0),       // Black
+            Color.FromArgb(255, 127, 127, 127),  // Gray-50%
+            Color.FromArgb(255, 136, 0, 21),     // Dark Red
+            Color.FromArgb(255, 237, 28, 36),    // Red
+            Color.FromArgb(255, 255, 127, 39),   // Orange
+            Color.FromArgb(255, 255, 242, 0),    // Yellow
+            Color.FromArgb(255, 34, 177, 76),    // Green
+            Color.FromArgb(255, 0, 162, 232),    // Turquoise
+            Color.FromArgb(255, 63, 72, 204),    // Indigo
+            Color.FromArgb(255, 163, 73, 164),   // Purple
+            Color.FromArgb(255, 0, 0, 0),        // Black (spare slot)
+            Color.FromArgb(255, 185, 122, 87),   // Brown (Tan/Sienna)
+            Color.FromArgb(255, 255, 174, 201),  // Rose
+            Color.FromArgb(255, 181, 230, 29),   // Lime
+
+            // Row 2 (bottom)
+            Color.FromArgb(255, 255, 255, 255),  // White
+            Color.FromArgb(255, 195, 195, 195),  // Gray-25%
+            Color.FromArgb(255, 185, 122, 87),   // Brown
+            Color.FromArgb(255, 255, 174, 201),  // Pink
+            Color.FromArgb(255, 255, 201, 14),   // Gold
+            Color.FromArgb(255, 239, 228, 176),  // Light Yellow
+            Color.FromArgb(255, 181, 230, 29),   // Lime
+            Color.FromArgb(255, 153, 217, 234),  // Light Turquoise
+            Color.FromArgb(255, 112, 146, 190),  // Blue-Grey
+            Color.FromArgb(255, 200, 191, 231),  // Lavender
+            Color.FromArgb(255, 128, 128, 128),  // Med Gray
+            Color.FromArgb(255, 255, 201, 14),   // Gold-2
+            Color.FromArgb(255, 239, 228, 176),  // Tan
+            Color.FromArgb(255, 153, 217, 234),  // Light Blue
         };
         foreach (var c in colors)
             _paletteColors.Add(new SolidColorBrush(c));
@@ -295,6 +320,18 @@ public sealed partial class MainWindow : Window
             return;
         }
 
+        // Magnifier: left-click zooms in, right-click zooms out
+        if (_currentToolType == DrawingTool.Magnifier)
+        {
+            _isPointerDown = false;
+            DrawingCanvas.ReleasePointerCapture(e.Pointer);
+            if (pointerPoint.Properties.IsRightButtonPressed)
+                SetZoom(_zoomFactor / 1.5f);
+            else
+                SetZoom(_zoomFactor * 1.5f);
+            return;
+        }
+
         // Text tool manages its own undo in InsertTextAsync
         if (_currentToolType == DrawingTool.Text)
         {
@@ -461,7 +498,7 @@ public sealed partial class MainWindow : Window
 
     private void Tool_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is AppBarButton btn && btn.Tag is string tag)
+        if (sender is ToggleButton btn && btn.Tag is string tag)
         {
             if (Enum.TryParse<DrawingTool>(tag, out var tool))
             {
@@ -483,6 +520,14 @@ public sealed partial class MainWindow : Window
         SyncShapeToolOptions();
     }
 
+    private void BrushStyleCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_tools.TryGetValue(DrawingTool.Brush, out var tool) && tool is BrushTool brushTool)
+        {
+            brushTool.CurrentStyle = (BrushStyle)BrushStyleCombo.SelectedIndex;
+        }
+    }
+
     private void SyncShapeToolOptions()
     {
         if (_tools.TryGetValue(DrawingTool.Shape, out var tool) && tool is ShapeTool shapeTool)
@@ -493,18 +538,22 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private void TransparentSelection_Click(object sender, RoutedEventArgs e)
+    {
+        if (_tools.TryGetValue(DrawingTool.Selection, out var tool) && tool is SelectionTool sel)
+        {
+            sel.TransparentSelection = TransparentSelectionCheck.IsChecked == true;
+            sel.TransparentColor = _secondaryColor;
+        }
+    }
+
     private void HighlightActiveTool()
     {
         var toolName = _currentToolType.ToString();
-        var buttons = new[] { BtnPencil, BtnBrush, BtnEraser, BtnFill, BtnText, BtnEyedropper, BtnLine, BtnCurve, BtnShape, BtnSelect, BtnFreeSelect };
+        var buttons = new[] { BtnPencil, BtnBrush, BtnEraser, BtnFill, BtnText, BtnEyedropper, BtnLine, BtnCurve, BtnShape, BtnSelect, BtnFreeSelect, BtnMagnifier };
         foreach (var btn in buttons)
         {
-            btn.BorderBrush = btn.Tag?.ToString() == toolName
-                ? new SolidColorBrush(Colors.DodgerBlue)
-                : new SolidColorBrush(Colors.Transparent);
-            btn.BorderThickness = btn.Tag?.ToString() == toolName
-                ? new Thickness(0, 0, 0, 2)
-                : new Thickness(0);
+            btn.IsChecked = btn.Tag?.ToString() == toolName;
         }
     }
 
@@ -519,6 +568,13 @@ public sealed partial class MainWindow : Window
             _primaryColor = brush.Color;
             PrimaryColorBorder.Background = new SolidColorBrush(_primaryColor);
         }
+    }
+
+    private void SwapColors_Click(object sender, RoutedEventArgs e)
+    {
+        (_primaryColor, _secondaryColor) = (_secondaryColor, _primaryColor);
+        PrimaryColorBorder.Background = new SolidColorBrush(_primaryColor);
+        SecondaryColorBorder.Background = new SolidColorBrush(_secondaryColor);
     }
 
     private async void PrimaryColor_Tapped(object sender, TappedRoutedEventArgs e)
@@ -866,6 +922,25 @@ public sealed partial class MainWindow : Window
         DrawingCanvas.Invalidate();
     }
 
+    private async void PasteFromFile_Click(object sender, RoutedEventArgs e)
+    {
+        var file = await _fileService.ShowOpenDialogAsync();
+        if (file == null) return;
+
+        var bitmap = await _fileService.LoadImageAsync(DrawingCanvas, file);
+        if (bitmap == null || ActiveLayer?.Bitmap == null) return;
+
+        var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, "Paste From File");
+        action.CaptureBeforeState();
+        using (var ds = ActiveLayer.Bitmap.CreateDrawingSession())
+            ds.DrawImage(bitmap);
+        action.CaptureAfterState();
+        _undoManager.Push(action);
+        bitmap.Dispose();
+        _fileService.HasUnsavedChanges = true;
+        DrawingCanvas.Invalidate();
+    }
+
     private void UpdateUndoRedoState()
     {
         UndoMenuItem.IsEnabled = _undoManager.CanUndo;
@@ -1019,6 +1094,21 @@ public sealed partial class MainWindow : Window
         var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, "Invert Colors");
         action.CaptureBeforeState();
         ImageTransforms.InvertColors(ActiveLayer.Bitmap);
+        action.CaptureAfterState();
+        _undoManager.Push(action);
+        _fileService.HasUnsavedChanges = true;
+        DrawingCanvas.Invalidate();
+    }
+
+    private void ClearImage_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveLayer?.Bitmap == null) return;
+        var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, "Clear Image");
+        action.CaptureBeforeState();
+        using (var ds = ActiveLayer.Bitmap.CreateDrawingSession())
+        {
+            ds.Clear(_secondaryColor);
+        }
         action.CaptureAfterState();
         _undoManager.Push(action);
         _fileService.HasUnsavedChanges = true;
