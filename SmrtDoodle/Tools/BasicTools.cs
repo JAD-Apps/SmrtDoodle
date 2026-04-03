@@ -16,14 +16,27 @@ public class PencilTool : ToolBase
     public override void OnPointerPressed(CanvasDrawingSession ds, Vector2 point, Color color, float strokeWidth)
     {
         base.OnPointerPressed(ds, point, color, strokeWidth);
-        ds.DrawCircle(point, strokeWidth / 4f, color);
+        DrawFilledStroke(ds, point, point, color, Math.Max(1f, strokeWidth / 2f));
     }
 
     public override void OnPointerMoved(CanvasDrawingSession ds, Vector2 point, Color color, float strokeWidth)
     {
         if (!IsDrawing) return;
-        ds.DrawLine(LastPoint, point, color, strokeWidth / 2f);
+        DrawFilledStroke(ds, LastPoint, point, color, Math.Max(1f, strokeWidth / 2f));
         LastPoint = point;
+    }
+
+    private static void DrawFilledStroke(CanvasDrawingSession ds, Vector2 from, Vector2 to, Color color, float radius)
+    {
+        var distance = Vector2.Distance(from, to);
+        var steps = Math.Max(1, (int)MathF.Ceiling(distance / Math.Max(1f, radius * 0.5f)));
+
+        for (int i = 0; i <= steps; i++)
+        {
+            var t = steps == 0 ? 0f : (float)i / steps;
+            var point = Vector2.Lerp(from, to, t);
+            ds.FillCircle(point, radius, color);
+        }
     }
 }
 
@@ -51,21 +64,41 @@ public class BrushTool : ToolBase
 
     private void DrawBrushDab(CanvasDrawingSession ds, Vector2 from, Vector2 to, Color color, float strokeWidth)
     {
+        static void StampFilledCircles(CanvasDrawingSession canvas, Vector2 start, Vector2 end, Color stampColor, float radius, float spacingFactor = 0.5f)
+        {
+            var r = Math.Max(1f, radius);
+            var distance = Vector2.Distance(start, end);
+            var spacing = Math.Max(1f, r * spacingFactor);
+            var steps = Math.Max(1, (int)MathF.Ceiling(distance / spacing));
+
+            for (int i = 0; i <= steps; i++)
+            {
+                var t = steps == 0 ? 0f : (float)i / steps;
+                var p = Vector2.Lerp(start, end, t);
+                canvas.FillCircle(p, r, stampColor);
+            }
+        }
+
         switch (CurrentStyle)
         {
             case BrushStyle.Normal:
             {
-                var style = new CanvasStrokeStyle { StartCap = CanvasCapStyle.Round, EndCap = CanvasCapStyle.Round };
-                ds.DrawLine(from, to, color, strokeWidth, style);
+                StampFilledCircles(ds, from, to, color, strokeWidth * 0.5f);
                 break;
             }
             case BrushStyle.Calligraphy:
             {
-                // Angled flat brush
-                var offset = new Vector2(strokeWidth * 0.35f, -strokeWidth * 0.35f);
-                ds.DrawLine(from + offset, to + offset, color, strokeWidth * 0.3f);
-                ds.DrawLine(from - offset, to - offset, color, strokeWidth * 0.3f);
-                ds.DrawLine(from, to, color, strokeWidth * 0.5f);
+                var dist = Vector2.Distance(from, to);
+                var steps = Math.Max(1, (int)MathF.Ceiling(dist / Math.Max(1f, strokeWidth * 0.35f)));
+                var major = Math.Max(1f, strokeWidth * 0.7f);
+                var minor = Math.Max(1f, strokeWidth * 0.35f);
+
+                for (int i = 0; i <= steps; i++)
+                {
+                    var t = steps == 0 ? 0f : (float)i / steps;
+                    var center = Vector2.Lerp(from, to, t);
+                    ds.FillEllipse(center.X, center.Y, major, minor, color);
+                }
                 break;
             }
             case BrushStyle.Airbrush:
@@ -89,11 +122,9 @@ public class BrushTool : ToolBase
             }
             case BrushStyle.Oil:
             {
-                // Thick opaque stroke with slight texture
-                var style = new CanvasStrokeStyle { StartCap = CanvasCapStyle.Flat, EndCap = CanvasCapStyle.Flat };
-                ds.DrawLine(from, to, color, strokeWidth * 1.5f, style);
+                StampFilledCircles(ds, from, to, color, strokeWidth * 0.75f, 0.4f);
                 var highlight = Color.FromArgb(40, 255, 255, 255);
-                ds.DrawLine(from + new Vector2(0, -strokeWidth * 0.3f), to + new Vector2(0, -strokeWidth * 0.3f), highlight, strokeWidth * 0.4f);
+                StampFilledCircles(ds, from + new Vector2(0, -strokeWidth * 0.2f), to + new Vector2(0, -strokeWidth * 0.2f), highlight, strokeWidth * 0.2f, 0.6f);
                 break;
             }
             case BrushStyle.Crayon:
@@ -115,11 +146,9 @@ public class BrushTool : ToolBase
             }
             case BrushStyle.Marker:
             {
-                // Semi-transparent wide stroke
                 var alpha = (byte)Math.Min(128, (int)color.A);
                 var markerColor = Color.FromArgb(alpha, color.R, color.G, color.B);
-                var style = new CanvasStrokeStyle { StartCap = CanvasCapStyle.Square, EndCap = CanvasCapStyle.Square };
-                ds.DrawLine(from, to, markerColor, strokeWidth * 1.8f, style);
+                StampFilledCircles(ds, from, to, markerColor, strokeWidth * 0.9f, 0.35f);
                 break;
             }
             case BrushStyle.NaturalPencil:
@@ -141,14 +170,11 @@ public class BrushTool : ToolBase
             }
             case BrushStyle.Watercolor:
             {
-                // Very transparent wide soft dabs
                 var alpha = (byte)Math.Min(40, (int)color.A);
                 var wcColor = Color.FromArgb(alpha, color.R, color.G, color.B);
-                var style = new CanvasStrokeStyle { StartCap = CanvasCapStyle.Round, EndCap = CanvasCapStyle.Round };
-                ds.DrawLine(from, to, wcColor, strokeWidth * 2.5f, style);
-                // Second lighter pass for diffusion
+                StampFilledCircles(ds, from, to, wcColor, strokeWidth * 1.25f, 0.45f);
                 var wcColor2 = Color.FromArgb((byte)(alpha / 2), color.R, color.G, color.B);
-                ds.DrawLine(from, to, wcColor2, strokeWidth * 3.5f, style);
+                StampFilledCircles(ds, from, to, wcColor2, strokeWidth * 1.75f, 0.6f);
                 break;
             }
         }
