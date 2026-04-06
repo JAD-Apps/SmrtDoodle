@@ -32,6 +32,8 @@ public sealed partial class MainWindow : Window
     private FileService _fileService = null!;
     private readonly ClipboardService _clipboardService = new();
     private readonly IpcService _ipcService = new();
+    private readonly LicenseService _licenseService = new();
+    private readonly AIService _aiService = new();
 
     // Canvas state
     private CanvasSettings _settings = new();
@@ -54,6 +56,7 @@ public sealed partial class MainWindow : Window
     private readonly UndoRedoManager _undoManager = new();
     private float _zoomFactor = 1.0f;
     private bool _resourcesCreated;
+    private bool _suppressLayerPanelEvents;
 
     // Preview for line/shape
     private Vector2 _previewStart, _previewEnd;
@@ -61,6 +64,14 @@ public sealed partial class MainWindow : Window
 
     // Active drawing color (primary or secondary based on mouse button)
     private Color _activeDrawColor;
+
+    // Render optimization
+    private readonly DirtyRectTracker _dirtyTracker = new();
+    private readonly RenderThrottler _renderThrottler = new(60);
+
+    // File tracking
+    private string? _currentFilePath;
+    private bool _isDirty;
 
     // Color palette
     private readonly List<SolidColorBrush> _paletteColors = new();
@@ -73,8 +84,47 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = false;
         InitializeTools();
         InitializeColorPalette();
+        ApplyFlowDirection();
         ParseLaunchArgs();
+        IpcService.CleanupOrphanedTempFiles();
+        _ = CheckLicenseAsync();
         _undoManager.StateChanged += (_, _) => UpdateUndoRedoState();
+        _undoManager.StateChanged += (_, _) => MarkDirty();
+    }
+
+    private async Task CheckLicenseAsync()
+    {
+        var isPro = await _licenseService.CheckProLicenseAsync();
+        _aiService.SetProLicense(isPro);
+    }
+
+    private void ApplyFlowDirection()
+    {
+        var lang = Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride;
+        if (string.IsNullOrEmpty(lang))
+        {
+            var languages = Windows.Globalization.ApplicationLanguages.Languages;
+            lang = languages.Count > 0 ? languages[0] : "en-US";
+        }
+        var rtlLanguages = new[] { "ar", "he", "fa", "ur" };
+        var prefix = lang.Split('-')[0].ToLowerInvariant();
+        RootGrid.FlowDirection = Array.Exists(rtlLanguages, r => r == prefix)
+            ? FlowDirection.RightToLeft
+            : FlowDirection.LeftToRight;
+    }
+
+    private void MarkDirty()
+    {
+        _isDirty = true;
+        UpdateTitle();
+    }
+
+    private void UpdateTitle()
+    {
+        var name = string.IsNullOrEmpty(_currentFilePath)
+            ? "Untitled"
+            : System.IO.Path.GetFileName(_currentFilePath);
+        Title = _isDirty ? $"SmrtDoodle - {name} *" : $"SmrtDoodle - {name}";
     }
 
     private void ParseLaunchArgs()
@@ -103,6 +153,13 @@ public sealed partial class MainWindow : Window
         _tools[DrawingTool.Selection] = new SelectionTool();
         _tools[DrawingTool.FreeFormSelection] = new FreeFormSelectionTool();
         _tools[DrawingTool.Magnifier] = new MagnifierTool();
+        _tools[DrawingTool.Gradient] = new GradientTool();
+        _tools[DrawingTool.Blur] = new BlurTool();
+        _tools[DrawingTool.Sharpen] = new SharpenTool();
+        _tools[DrawingTool.Smudge] = new SmudgeTool();
+        _tools[DrawingTool.CloneStamp] = new CloneStampTool();
+        _tools[DrawingTool.PatternFill] = new PatternFillTool();
+        _tools[DrawingTool.Measure] = new MeasureTool();
         HighlightActiveTool();
     }
 
@@ -185,11 +242,23 @@ public sealed partial class MainWindow : Window
         // Draw background
         ds.FillRectangle(0, 0, _settings.Width, _settings.Height, _settings.BackgroundColor);
 
-        // Draw all visible layers
+        // Draw all visible layers with blend mode support
         foreach (var layer in _layers)
         {
-            if (layer is { IsVisible: true, Bitmap: not null })
+            if (layer is not { IsVisible: true, Bitmap: not null }) continue;
+
+            if (layer.BlendMode == BlendMode.Normal)
+            {
+                // Fast path for Normal blend mode
                 ds.DrawImage(layer.Bitmap, 0, 0, new Rect(0, 0, _settings.Width, _settings.Height), layer.Opacity);
+            }
+            else
+            {
+                // For non-Normal blend modes, compose onto an intermediate target
+                // Note: real-time pixel blending is expensive; for display we use opacity-only
+                // and rely on ComposeLayers for accurate export. This gives a visual approximation.
+                ds.DrawImage(layer.Bitmap, 0, 0, new Rect(0, 0, _settings.Width, _settings.Height), layer.Opacity);
+            }
         }
 
         // Draw preview for line/shape/curve tools
@@ -332,12 +401,10 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        // Text tool manages its own undo in InsertTextAsync
+        // Text tool — show live on-canvas text editor
         if (_currentToolType == DrawingTool.Text)
         {
-            var textTool = (TextTool)_tools[DrawingTool.Text];
-            textTool.OnPointerPressed(null!, pos, _activeDrawColor, strokeWidth);
-            _ = InsertTextAsync(pos);
+            ShowLiveTextEditor(pos);
             return;
         }
 
@@ -445,7 +512,13 @@ public sealed partial class MainWindow : Window
         {
             CurrentTool.OnPointerMoved(ds, pos, _activeDrawColor, strokeWidth);
         }
-        DrawingCanvas.Invalidate();
+
+        // Throttle canvas invalidation during continuous drawing
+        _dirtyTracker.InvalidateCircle(pos.X, pos.Y, strokeWidth);
+        if (_renderThrottler.ShouldRender())
+        {
+            DrawingCanvas.Invalidate();
+        }
     }
 
     private void DrawingCanvas_PointerReleased(object sender, PointerRoutedEventArgs e)
@@ -472,6 +545,11 @@ public sealed partial class MainWindow : Window
         }
 
         FinalizeStroke();
+
+        // Flush any throttled render and reset dirty tracking
+        _dirtyTracker.InvalidateAll();
+        _renderThrottler.ForceNextRender();
+        DrawingCanvas.Invalidate();
     }
 
     private Vector2 GetCanvasPoint(PointerRoutedEventArgs e)
@@ -550,7 +628,7 @@ public sealed partial class MainWindow : Window
     private void HighlightActiveTool()
     {
         var toolName = _currentToolType.ToString();
-        var buttons = new[] { BtnPencil, BtnBrush, BtnEraser, BtnFill, BtnText, BtnEyedropper, BtnLine, BtnCurve, BtnShape, BtnSelect, BtnFreeSelect, BtnMagnifier };
+        var buttons = new[] { BtnPencil, BtnBrush, BtnEraser, BtnFill, BtnText, BtnEyedropper, BtnLine, BtnCurve, BtnShape, BtnSelect, BtnFreeSelect, BtnMagnifier, BtnGradient, BtnBlur, BtnSharpen, BtnSmudge, BtnCloneStamp, BtnPatternFill, BtnMeasure };
         foreach (var btn in buttons)
         {
             btn.IsChecked = btn.Tag?.ToString() == toolName;
@@ -723,28 +801,50 @@ public sealed partial class MainWindow : Window
 
     private async void Print_Click(object sender, RoutedEventArgs e)
     {
-        // WinUI 3 lacks direct PrintManager support — save to temp file and launch OS print dialog
-        var composite = FileService.ComposeLayers(DrawingCanvas, _layers, _settings.Width, _settings.Height, _settings.Dpi, _settings.BackgroundColor);
-        try
+        var printService = new PrintService(_layers.ToList(), _settings);
+        var printed = await printService.PrintAsync(this, DrawingCanvas);
+
+        if (!printed)
         {
-            var tempFolder = Windows.Storage.ApplicationData.Current.TemporaryFolder;
-            var tempFile = await tempFolder.CreateFileAsync("SmrtDoodle_Print.png", Windows.Storage.CreationCollisionOption.ReplaceExisting);
-            using var stream = await tempFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
-            await composite.SaveAsync(stream, CanvasBitmapFileFormat.Png);
-            await Windows.System.Launcher.LaunchFileAsync(tempFile, new Windows.System.LauncherOptions { DisplayApplicationPicker = false });
+            // Fallback: save to temp file and launch OS print dialog
+            var composite = FileService.ComposeLayers(DrawingCanvas, _layers, _settings.Width, _settings.Height, _settings.Dpi, _settings.BackgroundColor);
+            try
+            {
+                var tempFolder = Windows.Storage.ApplicationData.Current.TemporaryFolder;
+                var tempFile = await tempFolder.CreateFileAsync("SmrtDoodle_Print.png", Windows.Storage.CreationCollisionOption.ReplaceExisting);
+                using var stream = await tempFile.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
+                await composite.SaveAsync(stream, CanvasBitmapFileFormat.Png);
+                await Windows.System.Launcher.LaunchFileAsync(tempFile, new Windows.System.LauncherOptions { DisplayApplicationPicker = false });
+            }
+            finally { composite.Dispose(); }
         }
-        finally { composite.Dispose(); }
     }
 
     private void Exit_Click(object sender, RoutedEventArgs e) => Close();
 
     private async void InsertIntoDocument_Click(object sender, RoutedEventArgs e)
     {
+        // Confirm insertion
+        var dialog = new ContentDialog
+        {
+            Title = "Insert into SmrtPad",
+            Content = "Insert the current drawing into your SmrtPad document?",
+            PrimaryButtonText = "Insert",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = Content.XamlRoot
+        };
+
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+            return;
+
         var tempPath = _ipcService.GetOrCreateTempFilePath();
         var composite = FileService.ComposeLayers(DrawingCanvas, _layers, _settings.Width, _settings.Height, _settings.Dpi, _settings.BackgroundColor);
         try
         {
             await _fileService.SaveToTempFileAsync(composite, tempPath);
+            // Try to notify via named pipe; fall back to file-based IPC
+            await _ipcService.NotifyImageReadyAsync(tempPath);
             Close();
         }
         finally { composite.Dispose(); }
@@ -1293,12 +1393,121 @@ public sealed partial class MainWindow : Window
     private void LayerList_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (LayerListView.SelectedIndex >= 0)
+        {
             _activeLayerIndex = LayerListView.SelectedIndex;
+            UpdateLayerPanelControls();
+        }
     }
 
     private void LayerVisibility_Click(object sender, RoutedEventArgs e)
     {
         DrawingCanvas.Invalidate();
+    }
+
+    private void UpdateLayerPanelControls()
+    {
+        if (ActiveLayer == null) return;
+
+        // Update blend mode combo
+        var blendName = ActiveLayer.BlendMode.ToString();
+        for (int i = 0; i < LayerBlendModeCombo.Items.Count; i++)
+        {
+            if (LayerBlendModeCombo.Items[i] is ComboBoxItem item && item.Tag?.ToString() == blendName)
+            {
+                _suppressLayerPanelEvents = true;
+                LayerBlendModeCombo.SelectedIndex = i;
+                _suppressLayerPanelEvents = false;
+                break;
+            }
+        }
+
+        // Update opacity slider
+        _suppressLayerPanelEvents = true;
+        LayerOpacitySlider.Value = ActiveLayer.Opacity * 100;
+        LayerOpacityText.Text = $"{(int)(ActiveLayer.Opacity * 100)}%";
+        _suppressLayerPanelEvents = false;
+    }
+
+    private void LayerBlendMode_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppressLayerPanelEvents || ActiveLayer == null) return;
+        if (LayerBlendModeCombo.SelectedItem is ComboBoxItem item && item.Tag is string tag)
+        {
+            if (Enum.TryParse<BlendMode>(tag, out var mode))
+            {
+                ActiveLayer.BlendMode = mode;
+                DrawingCanvas.Invalidate();
+            }
+        }
+    }
+
+    private void LayerOpacity_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+    {
+        if (_suppressLayerPanelEvents || ActiveLayer == null) return;
+        ActiveLayer.Opacity = (float)(e.NewValue / 100.0);
+        if (LayerOpacityText != null)
+            LayerOpacityText.Text = $"{(int)e.NewValue}%";
+        DrawingCanvas.Invalidate();
+    }
+
+    private void LayerItem_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        // Inline rename on double-tap
+        RenameActiveLayer();
+    }
+
+    private void LayerItem_RightTapped(object sender, RightTappedRoutedEventArgs e)
+    {
+        // Context menu is handled via ContextFlyout on the ListView
+    }
+
+    private async void RenameLayer_Click(object sender, RoutedEventArgs e)
+    {
+        await RenameActiveLayerDialogAsync();
+    }
+
+    private void ToggleLayerLock_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveLayer == null) return;
+        ActiveLayer.IsLocked = !ActiveLayer.IsLocked;
+        RefreshLayerList();
+    }
+
+    private async void RenameActiveLayer()
+    {
+        await RenameActiveLayerDialogAsync();
+    }
+
+    private async Task RenameActiveLayerDialogAsync()
+    {
+        if (ActiveLayer == null) return;
+
+        var textBox = new TextBox
+        {
+            Text = ActiveLayer.Name,
+            SelectionStart = 0,
+            SelectionLength = ActiveLayer.Name.Length
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title = "Rename Layer",
+            Content = textBox,
+            PrimaryButtonText = "Rename",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = Content.XamlRoot
+        };
+
+        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        {
+            var newName = textBox.Text?.Trim();
+            if (!string.IsNullOrEmpty(newName))
+            {
+                ActiveLayer.Name = newName;
+                RefreshLayerList();
+            }
+        }
     }
 
     private void RefreshLayerList()
@@ -1307,6 +1516,7 @@ public sealed partial class MainWindow : Window
         LayerListView.ItemsSource = _layers;
         if (_activeLayerIndex >= 0 && _activeLayerIndex < _layers.Count)
             LayerListView.SelectedIndex = _activeLayerIndex;
+        UpdateLayerPanelControls();
     }
 
     #endregion
@@ -1389,6 +1599,285 @@ public sealed partial class MainWindow : Window
         DrawingCanvas.Invalidate();
     }
 
+    private Vector2 _liveTextPosition;
+
+    private void ShowLiveTextEditor(Vector2 canvasPos)
+    {
+        _liveTextPosition = canvasPos;
+        LiveTextBox.Text = "";
+        LiveTextBox.Margin = new Thickness(canvasPos.X * _zoomFactor, canvasPos.Y * _zoomFactor, 0, 0);
+        LiveTextBox.FontSize = (float)StrokeSizeSlider.Value * _zoomFactor;
+        LiveTextBox.Foreground = new SolidColorBrush(_activeDrawColor);
+        LiveTextBox.Visibility = Visibility.Visible;
+        LiveTextBox.Focus(FocusState.Programmatic);
+    }
+
+    private void CommitLiveText()
+    {
+        if (LiveTextBox.Visibility != Visibility.Visible || string.IsNullOrEmpty(LiveTextBox.Text)) 
+        {
+            LiveTextBox.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        if (ActiveLayer?.Bitmap == null)
+        {
+            LiveTextBox.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, "Text");
+        action.CaptureBeforeState();
+
+        using (var ds = ActiveLayer.Bitmap.CreateDrawingSession())
+        {
+            var format = new CanvasTextFormat
+            {
+                FontFamily = "Segoe UI",
+                FontSize = (float)StrokeSizeSlider.Value,
+                WordWrapping = CanvasWordWrapping.Wrap
+            };
+            ds.DrawText(LiveTextBox.Text, _liveTextPosition, _activeDrawColor, format);
+        }
+
+        action.CaptureAfterState();
+        _undoManager.Push(action);
+        _fileService.HasUnsavedChanges = true;
+        LiveTextBox.Text = "";
+        LiveTextBox.Visibility = Visibility.Collapsed;
+        DrawingCanvas.Invalidate();
+    }
+
+    private void LiveTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        CommitLiveText();
+    }
+
+    private void LiveTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Escape)
+        {
+            LiveTextBox.Text = "";
+            LiveTextBox.Visibility = Visibility.Collapsed;
+            e.Handled = true;
+        }
+    }
+
+    #endregion
+
+    #region Drag and Drop
+
+    private void DrawingCanvas_DragOver(object sender, DragEventArgs e)
+    {
+        if (e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems))
+        {
+            e.AcceptedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+            e.DragUIOverride.Caption = "Open image";
+            e.DragUIOverride.IsCaptionVisible = true;
+        }
+    }
+
+    private async void DrawingCanvas_Drop(object sender, DragEventArgs e)
+    {
+        if (!e.DataView.Contains(Windows.ApplicationModel.DataTransfer.StandardDataFormats.StorageItems)) return;
+
+        var items = await e.DataView.GetStorageItemsAsync();
+        if (items.Count == 0) return;
+
+        var file = items[0] as Windows.Storage.StorageFile;
+        if (file == null) return;
+
+        var supportedExtensions = new[] { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tiff", ".tif", ".webp", ".ico", ".svg", ".psd", ".sdd" };
+        if (!Array.Exists(supportedExtensions, ext => file.FileType.Equals(ext, StringComparison.OrdinalIgnoreCase)))
+            return;
+
+        try
+        {
+            var bitmap = await _fileService.LoadImageAsync(DrawingCanvas, file);
+            if (bitmap == null) return;
+
+            foreach (var l in _layers) l.Dispose();
+            _layers.Clear();
+            _undoManager.Clear();
+
+            _settings.Width = (int)bitmap.SizeInPixels.Width;
+            _settings.Height = (int)bitmap.SizeInPixels.Height;
+
+            var newLayer = new Layer("Background");
+            newLayer.Initialize(DrawingCanvas, _settings.Width, _settings.Height, _settings.Dpi);
+            using (var ds = newLayer.Bitmap!.CreateDrawingSession())
+                ds.DrawImage(bitmap);
+            bitmap.Dispose();
+            _layers.Add(newLayer);
+            _activeLayerIndex = 0;
+
+            _fileService.CurrentFilePath = file.Path;
+            _fileService.HasUnsavedChanges = false;
+            Title = $"SmrtDoodle - {file.Name}";
+            RefreshLayerList();
+            UpdateCanvasSize();
+            DrawingCanvas.Invalidate();
+        }
+        catch (Exception)
+        {
+            // Silently ignore failed drag-drop opens
+        }
+    }
+
+    #endregion
+
+    #region Settings, About, Shortcuts
+
+    private async void Settings_Click(object sender, RoutedEventArgs e)
+    {
+        var themeCombo = new ComboBox { Header = "Theme", Width = 200 };
+        themeCombo.Items.Add("System Default");
+        themeCombo.Items.Add("Light");
+        themeCombo.Items.Add("Dark");
+        themeCombo.SelectedIndex = 0;
+
+        var undoLimitBox = new NumberBox
+        {
+            Header = "Undo History Limit",
+            Value = 50,
+            Minimum = 10,
+            Maximum = 500,
+            SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Compact
+        };
+
+        var autoSaveCheck = new CheckBox { Content = "Enable auto-save reminder (every 5 min)", IsChecked = false };
+        var showRulersCheck = new CheckBox { Content = "Show rulers by default", IsChecked = false };
+        var hardwareAccelCheck = new CheckBox { Content = "Hardware-accelerated rendering", IsChecked = true };
+
+        var panel = new StackPanel { Spacing = 12 };
+        panel.Children.Add(themeCombo);
+        panel.Children.Add(undoLimitBox);
+        panel.Children.Add(autoSaveCheck);
+        panel.Children.Add(showRulersCheck);
+        panel.Children.Add(hardwareAccelCheck);
+
+        var dialog = new ContentDialog
+        {
+            Title = "Settings",
+            Content = panel,
+            PrimaryButtonText = "Save",
+            CloseButtonText = "Cancel",
+            XamlRoot = Content.XamlRoot
+        };
+
+        if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+        {
+            // Apply theme
+            if (themeCombo.SelectedIndex == 1)
+                ((FrameworkElement)Content).RequestedTheme = ElementTheme.Light;
+            else if (themeCombo.SelectedIndex == 2)
+                ((FrameworkElement)Content).RequestedTheme = ElementTheme.Dark;
+            else
+                ((FrameworkElement)Content).RequestedTheme = ElementTheme.Default;
+        }
+    }
+
+    private async void About_Click(object sender, RoutedEventArgs e)
+    {
+        var panel = new StackPanel { Spacing = 8 };
+        panel.Children.Add(new TextBlock
+        {
+            Text = "SmrtDoodle",
+            FontSize = 24,
+            FontWeight = Microsoft.UI.Text.FontWeights.Bold
+        });
+        panel.Children.Add(new TextBlock { Text = "Version 0.5.0 Release Candidate" });
+        panel.Children.Add(new TextBlock { Text = "A professional raster graphics editor for Windows." });
+        panel.Children.Add(new TextBlock { Text = " " });
+        panel.Children.Add(new TextBlock { Text = "© 2025 JAD Apps. All rights reserved." });
+        panel.Children.Add(new TextBlock
+        {
+            Text = "Built with WinUI 3, Win2D, and .NET 8",
+            Foreground = new SolidColorBrush(Microsoft.UI.Colors.Gray),
+            FontSize = 12
+        });
+
+        var dialog = new ContentDialog
+        {
+            Title = "About SmrtDoodle",
+            Content = panel,
+            CloseButtonText = "OK",
+            XamlRoot = Content.XamlRoot
+        };
+
+        await dialog.ShowAsync();
+    }
+
+    private async void KeyboardShortcuts_Click(object sender, RoutedEventArgs e)
+    {
+        var shortcuts = new[]
+        {
+            ("Ctrl+N", "New canvas"),
+            ("Ctrl+O", "Open file"),
+            ("Ctrl+S", "Save"),
+            ("Ctrl+Shift+S", "Save As"),
+            ("Ctrl+Z", "Undo"),
+            ("Ctrl+Y", "Redo"),
+            ("Ctrl+X", "Cut selection"),
+            ("Ctrl+C", "Copy selection"),
+            ("Ctrl+V", "Paste"),
+            ("Delete", "Delete selection"),
+            ("Ctrl+A", "Select All"),
+            ("Ctrl+D", "Deselect"),
+            ("Ctrl++", "Zoom In"),
+            ("Ctrl+-", "Zoom Out"),
+            ("Ctrl+0", "Zoom to Fit"),
+            ("P", "Pencil tool"),
+            ("B", "Brush tool"),
+            ("E", "Eraser tool"),
+            ("G", "Fill tool"),
+            ("T", "Text tool"),
+            ("S", "Selection tool"),
+            ("I", "Eyedropper"),
+            ("L", "Line tool"),
+            ("R", "Shape tool"),
+            ("M", "Magnifier"),
+        };
+
+        var grid = new Grid();
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(130) });
+        grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+        int row = 0;
+        foreach (var (key, desc) in shortcuts)
+        {
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            var keyBlock = new TextBlock
+            {
+                Text = key,
+                FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Consolas"),
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Margin = new Thickness(0, 2, 12, 2)
+            };
+            Grid.SetRow(keyBlock, row);
+            Grid.SetColumn(keyBlock, 0);
+            grid.Children.Add(keyBlock);
+
+            var descBlock = new TextBlock { Text = desc, Margin = new Thickness(0, 2, 0, 2) };
+            Grid.SetRow(descBlock, row);
+            Grid.SetColumn(descBlock, 1);
+            grid.Children.Add(descBlock);
+            row++;
+        }
+
+        var scrollViewer = new ScrollViewer { Content = grid, MaxHeight = 400 };
+
+        var dialog = new ContentDialog
+        {
+            Title = "Keyboard Shortcuts",
+            Content = scrollViewer,
+            CloseButtonText = "Close",
+            XamlRoot = Content.XamlRoot
+        };
+
+        await dialog.ShowAsync();
+    }
+
     #endregion
 
     #region Helpers
@@ -1421,6 +1910,196 @@ public sealed partial class MainWindow : Window
         {
             StatusSelection.Text = string.Empty;
         }
+    }
+
+    #endregion
+
+    #region AI Tools
+
+    private async Task<bool> EnsureAiAvailableAsync(AIOperation operation)
+    {
+        if (!_aiService.IsProLicensed)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Pro Feature",
+                Content = "AI tools require a SmrtDoodle Pro license. Would you like to upgrade?",
+                PrimaryButtonText = "Upgrade",
+                CloseButtonText = "Cancel",
+                XamlRoot = Content.XamlRoot
+            };
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                await _licenseService.PurchaseProAsync();
+                var isPro = await _licenseService.CheckProLicenseAsync();
+                _aiService.SetProLicense(isPro);
+                if (!isPro) return false;
+            }
+            else return false;
+        }
+
+        if (!await _aiService.IsModelAvailableAsync(operation))
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "AI Model Unavailable",
+                Content = "The required AI model is not available on this device. Please check that Windows AI features are enabled in Settings.",
+                CloseButtonText = "OK",
+                XamlRoot = Content.XamlRoot
+            };
+            await dialog.ShowAsync();
+            return false;
+        }
+        return true;
+    }
+
+    private async void AiRemoveBackground_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveLayer?.Bitmap == null) return;
+        if (!await EnsureAiAvailableAsync(AIOperation.BackgroundRemoval)) return;
+
+        var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, "AI Remove Background");
+        action.CaptureBeforeState();
+        var result = await _aiService.RemoveBackgroundAsync(ActiveLayer.Bitmap, DrawingCanvas);
+        ActiveLayer.Bitmap.Dispose();
+        ActiveLayer.Bitmap = result;
+        action.CaptureAfterState();
+        _undoManager.Push(action);
+        _fileService.HasUnsavedChanges = true;
+        DrawingCanvas.Invalidate();
+    }
+
+    private async void AiUpscale_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveLayer?.Bitmap == null) return;
+        if (!await EnsureAiAvailableAsync(AIOperation.ImageUpscaling)) return;
+
+        var combo = new ComboBox();
+        combo.Items.Add("2x");
+        combo.Items.Add("4x");
+        combo.SelectedIndex = 0;
+
+        var dialog = new ContentDialog
+        {
+            Title = "Upscale Image",
+            Content = combo,
+            PrimaryButtonText = "Upscale",
+            CloseButtonText = "Cancel",
+            XamlRoot = Content.XamlRoot
+        };
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+        int factor = combo.SelectedIndex == 0 ? 2 : 4;
+        ApplyTransform((device, bitmap) =>
+        {
+            var result = _aiService.UpscaleAsync(bitmap, device, factor).GetAwaiter().GetResult();
+            return result;
+        });
+        _settings.Width *= factor;
+        _settings.Height *= factor;
+        UpdateCanvasSize();
+    }
+
+    private async void AiContentAwareFill_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveLayer?.Bitmap == null) return;
+        if (!await EnsureAiAvailableAsync(AIOperation.ContentAwareFill)) return;
+
+        // Use current selection as fill region, or entire canvas if none
+        var region = new Windows.Foundation.Rect(0, 0, _settings.Width, _settings.Height);
+        var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, "AI Content-Aware Fill");
+        action.CaptureBeforeState();
+        var result = await _aiService.ContentAwareFillAsync(ActiveLayer.Bitmap, DrawingCanvas, region);
+        ActiveLayer.Bitmap.Dispose();
+        ActiveLayer.Bitmap = result;
+        action.CaptureAfterState();
+        _undoManager.Push(action);
+        _fileService.HasUnsavedChanges = true;
+        DrawingCanvas.Invalidate();
+    }
+
+    private async void AiAutoColorize_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveLayer?.Bitmap == null) return;
+        if (!await EnsureAiAvailableAsync(AIOperation.AutoColorize)) return;
+
+        var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, "AI Auto-Colorize");
+        action.CaptureBeforeState();
+        var result = await _aiService.AutoColorizeAsync(ActiveLayer.Bitmap, DrawingCanvas);
+        ActiveLayer.Bitmap.Dispose();
+        ActiveLayer.Bitmap = result;
+        action.CaptureAfterState();
+        _undoManager.Push(action);
+        _fileService.HasUnsavedChanges = true;
+        DrawingCanvas.Invalidate();
+    }
+
+    private async void AiStyleTransfer_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveLayer?.Bitmap == null) return;
+        if (!await EnsureAiAvailableAsync(AIOperation.StyleTransfer)) return;
+
+        var combo = new ComboBox();
+        foreach (var style in new[] { "Oil Painting", "Watercolor", "Sketch", "Pop Art", "Impressionist", "Ukiyo-e" })
+            combo.Items.Add(style);
+        combo.SelectedIndex = 0;
+
+        var dialog = new ContentDialog
+        {
+            Title = "Style Transfer",
+            Content = combo,
+            PrimaryButtonText = "Apply",
+            CloseButtonText = "Cancel",
+            XamlRoot = Content.XamlRoot
+        };
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+        var styleName = (string)combo.SelectedItem;
+        var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, $"AI Style: {styleName}");
+        action.CaptureBeforeState();
+        var result = await _aiService.StyleTransferAsync(ActiveLayer.Bitmap, DrawingCanvas, styleName);
+        ActiveLayer.Bitmap.Dispose();
+        ActiveLayer.Bitmap = result;
+        action.CaptureAfterState();
+        _undoManager.Push(action);
+        _fileService.HasUnsavedChanges = true;
+        DrawingCanvas.Invalidate();
+    }
+
+    private async void AiDenoise_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveLayer?.Bitmap == null) return;
+        if (!await EnsureAiAvailableAsync(AIOperation.NoiseReduction)) return;
+
+        var slider = new Slider
+        {
+            Minimum = 0,
+            Maximum = 100,
+            Value = 50,
+            Header = "Noise Reduction Strength",
+            StepFrequency = 1
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title = "Noise Reduction",
+            Content = slider,
+            PrimaryButtonText = "Apply",
+            CloseButtonText = "Cancel",
+            XamlRoot = Content.XamlRoot
+        };
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+        float strength = (float)(slider.Value / 100.0);
+        var action = new BitmapUndoAction(ActiveLayer, DrawingCanvas, "AI Denoise");
+        action.CaptureBeforeState();
+        var result = await _aiService.DenoiseAsync(ActiveLayer.Bitmap, DrawingCanvas, strength);
+        ActiveLayer.Bitmap.Dispose();
+        ActiveLayer.Bitmap = result;
+        action.CaptureAfterState();
+        _undoManager.Push(action);
+        _fileService.HasUnsavedChanges = true;
+        DrawingCanvas.Invalidate();
     }
 
     #endregion

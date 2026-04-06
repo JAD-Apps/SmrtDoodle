@@ -15,7 +15,7 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid>
+    <Grid x:Name="RootGrid">
         <Grid.Resources>
             <helpers:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
         </Grid.Resources>
@@ -27,7 +27,9 @@
         </Grid.RowDefinitions>
 
         <!-- Menu Bar -->
-        <MenuBar Grid.Row="0">
+        <MenuBar Grid.Row="0"
+                 AutomationProperties.Name="Main menu"
+                 AutomationProperties.LandmarkType="Navigation">
             <MenuBarItem Title="File">
                 <MenuFlyoutItem Text="New" Click="New_Click">
                     <MenuFlyoutItem.KeyboardAccelerators>
@@ -129,6 +131,21 @@
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
                 <MenuFlyoutItem Text="Canvas Properties..." Click="CanvasProperties_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutSubItem Text="AI Tools (Pro)">
+                    <MenuFlyoutItem x:Name="AiRemoveBackground" Text="Remove Background" Click="AiRemoveBackground_Click"
+                                    AutomationProperties.Name="AI Remove Background"/>
+                    <MenuFlyoutItem x:Name="AiUpscale" Text="Upscale Image..." Click="AiUpscale_Click"
+                                    AutomationProperties.Name="AI Upscale Image"/>
+                    <MenuFlyoutItem x:Name="AiContentAwareFill" Text="Content-Aware Fill" Click="AiContentAwareFill_Click"
+                                    AutomationProperties.Name="AI Content-Aware Fill"/>
+                    <MenuFlyoutItem x:Name="AiAutoColorize" Text="Auto-Colorize" Click="AiAutoColorize_Click"
+                                    AutomationProperties.Name="AI Auto-Colorize"/>
+                    <MenuFlyoutItem x:Name="AiStyleTransfer" Text="Style Transfer..." Click="AiStyleTransfer_Click"
+                                    AutomationProperties.Name="AI Style Transfer"/>
+                    <MenuFlyoutItem x:Name="AiDenoise" Text="Noise Reduction..." Click="AiDenoise_Click"
+                                    AutomationProperties.Name="AI Noise Reduction"/>
+                </MenuFlyoutSubItem>
             </MenuBarItem>
             <MenuBarItem Title="View">
                 <ToggleMenuFlyoutItem x:Name="ShowGridToggle" Text="Show Grid" Click="ToggleGrid_Click"/>
@@ -158,10 +175,19 @@
                 <MenuFlyoutItem Text="Merge Down" Click="MergeDown_Click"/>
                 <MenuFlyoutItem Text="Flatten Image" Click="FlattenImage_Click"/>
             </MenuBarItem>
+            <MenuBarItem Title="Help">
+                <MenuFlyoutItem Text="Keyboard Shortcuts" Click="KeyboardShortcuts_Click"/>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Settings" Click="Settings_Click"/>
+                <MenuFlyoutItem Text="About SmrtDoodle" Click="About_Click"/>
+            </MenuBarItem>
         </MenuBar>
 
         <!-- ═══ RIBBON ═══ -->
         <Border x:Name="RibbonBar" Grid.Row="1"
+                AutomationProperties.Name="Toolbar ribbon"
+                AutomationProperties.LandmarkType="Custom"
+                AutomationProperties.LocalizedLandmarkType="Toolbar"
                 Background="{ThemeResource LayerFillColorDefaultBrush}"
                 BorderBrush="{ThemeResource DividerStrokeColorDefaultBrush}"
                 BorderThickness="0,0,0,1"
@@ -190,54 +216,84 @@
                     <StackPanel Grid.Row="0" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" Spacing="1">
                             <ToggleButton x:Name="BtnPencil" Click="Tool_Click" Tag="Pencil" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Pencil">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Pencil (P)" AutomationProperties.Name="Pencil tool" AccessKey="P">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xED63;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnBrush" Click="Tool_Click" Tag="Brush" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Brush">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Brush (B)" AutomationProperties.Name="Brush tool" AccessKey="B">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE790;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnEraser" Click="Tool_Click" Tag="Eraser" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Eraser">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Eraser (E)" AutomationProperties.Name="Eraser tool" AccessKey="E">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE75C;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnFill" Click="Tool_Click" Tag="Fill" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fill">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Fill (G)" AutomationProperties.Name="Fill tool" AccessKey="G">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE771;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnText" Click="Tool_Click" Tag="Text" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Text">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Text (T)" AutomationProperties.Name="Text tool" AccessKey="T">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8D2;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnEyedropper" Click="Tool_Click" Tag="Eyedropper" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Color Picker">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Color Picker (I)" AutomationProperties.Name="Eyedropper Color Picker tool" AccessKey="I">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEF3C;" FontSize="14"/>
                             </ToggleButton>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Spacing="1">
                             <ToggleButton x:Name="BtnLine" Click="Tool_Click" Tag="Line" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Line">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Line (L)" AutomationProperties.Name="Line tool" AccessKey="L">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE738;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnCurve" Click="Tool_Click" Tag="Curve" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Curve">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Curve (C)" AutomationProperties.Name="Curve tool" AccessKey="C">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE746;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnShape" Click="Tool_Click" Tag="Shape" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Shape">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Shape (H)" AutomationProperties.Name="Shape tool" AccessKey="H">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF158;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnSelect" Click="Tool_Click" Tag="Selection" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Select">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Select (S)" AutomationProperties.Name="Rectangle Selection tool" AccessKey="S">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8B3;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnFreeSelect" Click="Tool_Click" Tag="FreeFormSelection" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Free-form Select">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Free-form Select (F)" AutomationProperties.Name="Free-form Selection tool" AccessKey="F">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xEF20;" FontSize="14"/>
                             </ToggleButton>
                             <ToggleButton x:Name="BtnMagnifier" Click="Tool_Click" Tag="Magnifier" Width="30" Height="30" Padding="0" CornerRadius="4"
-                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Magnifier">
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Magnifier (M)" AutomationProperties.Name="Magnifier Zoom tool" AccessKey="M">
                                 <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71E;" FontSize="14"/>
+                            </ToggleButton>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="1">
+                            <ToggleButton x:Name="BtnGradient" Click="Tool_Click" Tag="Gradient" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Gradient (D)" AutomationProperties.Name="Gradient tool" AccessKey="D">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xF0E2;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnBlur" Click="Tool_Click" Tag="Blur" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Blur (U)" AutomationProperties.Name="Blur tool" AccessKey="U">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7B3;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnSharpen" Click="Tool_Click" Tag="Sharpen" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Sharpen (R)" AutomationProperties.Name="Sharpen tool" AccessKey="R">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7B3;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnSmudge" Click="Tool_Click" Tag="Smudge" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Smudge (X)" AutomationProperties.Name="Smudge tool" AccessKey="X">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE7E8;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnCloneStamp" Click="Tool_Click" Tag="CloneStamp" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Clone Stamp (N) — Alt+Click to set source" AutomationProperties.Name="Clone Stamp tool" AccessKey="N">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8C8;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnPatternFill" Click="Tool_Click" Tag="PatternFill" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Pattern Fill (A)" AutomationProperties.Name="Pattern Fill tool" AccessKey="A">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE771;" FontSize="14"/>
+                            </ToggleButton>
+                            <ToggleButton x:Name="BtnMeasure" Click="Tool_Click" Tag="Measure" Width="30" Height="30" Padding="0" CornerRadius="4"
+                                          Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="Measure (W)" AutomationProperties.Name="Measure Distance tool" AccessKey="W">
+                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE9B6;" FontSize="14"/>
                             </ToggleButton>
                         </StackPanel>
                     </StackPanel>
@@ -257,7 +313,7 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="4" Margin="0,0,0,4">
                         <TextBlock Text="Size" FontSize="11" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                         <Slider x:Name="StrokeSizeSlider" Minimum="1" Maximum="50" Value="3" Width="90"
-                                VerticalAlignment="Center"/>
+                                VerticalAlignment="Center" AutomationProperties.Name="Brush stroke size"/>
                     </StackPanel>
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="4">
                         <TextBlock Text="Style" FontSize="11" VerticalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
@@ -385,9 +441,16 @@
                 </Grid>
 
                 <!-- Insert Button (SmrtPad mode) -->
-                <Button x:Name="InsertButton" Grid.Column="9" Content="Insert into Document"
+                <Button x:Name="InsertButton" Grid.Column="9"
                         Click="InsertIntoDocument_Click" Visibility="Collapsed"
-                        Style="{ThemeResource AccentButtonStyle}" VerticalAlignment="Center" Margin="4,0"/>
+                        Style="{ThemeResource AccentButtonStyle}" VerticalAlignment="Center" Margin="4,0"
+                        AutomationProperties.Name="Insert drawing into SmrtPad document"
+                        ToolTipService.ToolTip="Insert this drawing into your SmrtPad document and close">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE8DE;" FontSize="14"/>
+                        <TextBlock Text="Insert into Document"/>
+                    </StackPanel>
+                </Button>
             </Grid>
         </Border>
 
@@ -400,16 +463,39 @@
 
             <!-- Canvas Area with ScrollViewer -->
             <ScrollViewer x:Name="CanvasScrollViewer" Grid.Column="0"
+                          AutomationProperties.Name="Canvas workspace"
+                          AutomationProperties.LandmarkType="Main"
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                           ZoomMode="Disabled" Background="{ThemeResource SolidBackgroundFillColorQuarternaryBrush}">
-                <Grid x:Name="CanvasContainer" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                <Grid x:Name="CanvasContainer" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20"
+                      FlowDirection="LeftToRight">
                     <!-- Main drawing canvas -->
                     <canvas:CanvasControl x:Name="DrawingCanvas"
+                                          AutomationProperties.Name="Drawing canvas"
                                           Draw="DrawingCanvas_Draw"
                                           CreateResources="DrawingCanvas_CreateResources"
                                           PointerPressed="DrawingCanvas_PointerPressed"
                                           PointerMoved="DrawingCanvas_PointerMoved"
-                                          PointerReleased="DrawingCanvas_PointerReleased"/>
+                                          PointerReleased="DrawingCanvas_PointerReleased"
+                                          AllowDrop="True"
+                                          DragOver="DrawingCanvas_DragOver"
+                                          Drop="DrawingCanvas_Drop"/>
+
+                    <!-- Live text editing overlay -->
+                    <TextBox x:Name="LiveTextBox"
+                             Visibility="Collapsed"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             Background="Transparent"
+                             BorderThickness="1"
+                             BorderBrush="DodgerBlue"
+                             MinWidth="100"
+                             MinHeight="30"
+                             HorizontalAlignment="Left"
+                             VerticalAlignment="Top"
+                             LostFocus="LiveTextBox_LostFocus"
+                             KeyDown="LiveTextBox_KeyDown"
+                             AutomationProperties.Name="Live text editor"/>
 
                     <!-- Ruler overlay (on top of drawing canvas) -->
                     <canvas:CanvasControl x:Name="RulerCanvas" Draw="RulerCanvas_Draw"
@@ -419,37 +505,130 @@
             </ScrollViewer>
 
             <!-- Layer Panel -->
-            <Grid Grid.Column="1" Width="200"
+            <Grid Grid.Column="1" Width="220"
+                  AutomationProperties.Name="Layer panel"
+                  AutomationProperties.LandmarkType="Custom"
+                  AutomationProperties.LocalizedLandmarkType="Layers"
                   Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                   BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
+
+                <!-- Header with blend mode and opacity -->
                 <TextBlock Text="Layers" FontWeight="SemiBold" Margin="8,8,8,4"/>
-                <ListView x:Name="LayerListView" Grid.Row="1" SelectionMode="Single"
+
+                <Grid Grid.Row="1" Margin="6,0,6,4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Blend" FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <ComboBox x:Name="LayerBlendModeCombo" Grid.Column="1" Height="28" FontSize="11"
+                              HorizontalAlignment="Stretch" SelectionChanged="LayerBlendMode_SelectionChanged">
+                        <ComboBoxItem Content="Normal" Tag="Normal"/>
+                        <ComboBoxItem Content="Dissolve" Tag="Dissolve"/>
+                        <ComboBoxItem Content="Darken" Tag="Darken"/>
+                        <ComboBoxItem Content="Multiply" Tag="Multiply"/>
+                        <ComboBoxItem Content="Color Burn" Tag="ColorBurn"/>
+                        <ComboBoxItem Content="Linear Burn" Tag="LinearBurn"/>
+                        <ComboBoxItem Content="Lighten" Tag="Lighten"/>
+                        <ComboBoxItem Content="Screen" Tag="Screen"/>
+                        <ComboBoxItem Content="Color Dodge" Tag="ColorDodge"/>
+                        <ComboBoxItem Content="Linear Dodge" Tag="LinearDodge"/>
+                        <ComboBoxItem Content="Overlay" Tag="Overlay"/>
+                        <ComboBoxItem Content="Soft Light" Tag="SoftLight"/>
+                        <ComboBoxItem Content="Hard Light" Tag="HardLight"/>
+                        <ComboBoxItem Content="Vivid Light" Tag="VividLight"/>
+                        <ComboBoxItem Content="Linear Light" Tag="LinearLight"/>
+                        <ComboBoxItem Content="Pin Light" Tag="PinLight"/>
+                        <ComboBoxItem Content="Difference" Tag="Difference"/>
+                        <ComboBoxItem Content="Exclusion" Tag="Exclusion"/>
+                        <ComboBoxItem Content="Hue" Tag="Hue"/>
+                        <ComboBoxItem Content="Saturation" Tag="Saturation"/>
+                        <ComboBoxItem Content="Color" Tag="Color"/>
+                        <ComboBoxItem Content="Luminosity" Tag="Luminosity"/>
+                    </ComboBox>
+                    <TextBlock Grid.Row="1" Text="Opacity" FontSize="11" VerticalAlignment="Center" Margin="0,2,4,0"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <Grid Grid.Row="1" Grid.Column="1" Margin="0,2,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Slider x:Name="LayerOpacitySlider" Minimum="0" Maximum="100" Value="100"
+                                VerticalAlignment="Center" ValueChanged="LayerOpacity_ValueChanged"/>
+                        <TextBlock x:Name="LayerOpacityText" Grid.Column="1" Text="100%" FontSize="11"
+                                   VerticalAlignment="Center" Width="32" TextAlignment="Right"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    </Grid>
+                </Grid>
+
+                <ListView x:Name="LayerListView" Grid.Row="2" SelectionMode="Single"
                           SelectionChanged="LayerList_SelectionChanged">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Grid Padding="4" ColumnSpacing="6">
+                            <Grid Padding="2" ColumnSpacing="4" Height="40"
+                                  DoubleTapped="LayerItem_DoubleTapped"
+                                  RightTapped="LayerItem_RightTapped">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="36"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
+
+                                <!-- Visibility checkbox -->
                                 <CheckBox IsChecked="{Binding IsVisible, Mode=TwoWay}" Grid.Column="0"
                                           MinWidth="0" Padding="0" Click="LayerVisibility_Click"/>
-                                <TextBlock Text="{Binding Name}" Grid.Column="1" VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <FontIcon Glyph="&#xE72E;" Grid.Column="2" FontSize="12"
+
+                                <!-- Layer thumbnail -->
+                                <Border Grid.Column="1" Width="32" Height="32" CornerRadius="2"
+                                        BorderBrush="{ThemeResource ControlStrokeColorSecondaryBrush}"
+                                        BorderThickness="1" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}">
+                                    <Image x:Name="LayerThumbnail" Stretch="Uniform"/>
+                                </Border>
+
+                                <!-- Layer name (TextBlock for display, TextBox for editing) -->
+                                <TextBlock Text="{Binding Name}" Grid.Column="2" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" FontSize="12"/>
+
+                                <!-- Lock icon -->
+                                <FontIcon Glyph="&#xE72E;" Grid.Column="3" FontSize="11"
                                           Visibility="{Binding IsLocked, Converter={StaticResource BoolToVisibility}}"
-                                          VerticalAlignment="Center"/>
+                                          VerticalAlignment="Center"
+                                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
+                    <ListView.ContextFlyout>
+                        <MenuFlyout>
+                            <MenuFlyoutItem Text="Rename Layer" Click="RenameLayer_Click">
+                                <MenuFlyoutItem.KeyboardAccelerators>
+                                    <KeyboardAccelerator Key="F2"/>
+                                </MenuFlyoutItem.KeyboardAccelerators>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Toggle Lock" Click="ToggleLayerLock_Click"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Duplicate Layer" Click="DuplicateLayer_Click"/>
+                            <MenuFlyoutItem Text="Merge Down" Click="MergeDown_Click"/>
+                            <MenuFlyoutItem Text="Flatten Image" Click="FlattenImage_Click"/>
+                            <MenuFlyoutSeparator/>
+                            <MenuFlyoutItem Text="Delete Layer" Click="DeleteLayer_Click"/>
+                        </MenuFlyout>
+                    </ListView.ContextFlyout>
                 </ListView>
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Padding="4">
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="4" Padding="4">
                     <Button Content="&#xE710;" FontFamily="Segoe MDL2 Assets" Click="AddLayer_Click"
                             ToolTipService.ToolTip="Add Layer" Width="36" Height="36"/>
                     <Button Content="&#xE74D;" FontFamily="Segoe MDL2 Assets" Click="DeleteLayer_Click"
@@ -466,6 +645,9 @@
 
         <!-- Status Bar -->
         <Grid Grid.Row="3" Padding="6,2" ColumnSpacing="16"
+              AutomationProperties.Name="Status bar"
+              AutomationProperties.LandmarkType="Custom"
+              AutomationProperties.LocalizedLandmarkType="Status"
               Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
               BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,1,0,0">
             <Grid.ColumnDefinitions>
@@ -476,14 +658,18 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock x:Name="StatusPosition" Grid.Column="0" Text="0, 0 px" VerticalAlignment="Center" FontSize="12"/>
-            <TextBlock x:Name="StatusCanvasSize" Grid.Column="1" Text="800 x 600 px" VerticalAlignment="Center" FontSize="12"/>
-            <TextBlock x:Name="StatusTool" Grid.Column="2" Text="Pencil" VerticalAlignment="Center" FontSize="12"/>
-            <TextBlock x:Name="StatusSelection" Grid.Column="3" Text="" VerticalAlignment="Center" FontSize="12"/>
+            <TextBlock x:Name="StatusPosition" Grid.Column="0" Text="0, 0 px" VerticalAlignment="Center" FontSize="12"
+                       AutomationProperties.Name="Cursor position" AutomationProperties.LiveSetting="Polite"/>
+            <TextBlock x:Name="StatusCanvasSize" Grid.Column="1" Text="800 x 600 px" VerticalAlignment="Center" FontSize="12"
+                       AutomationProperties.Name="Canvas size"/>
+            <TextBlock x:Name="StatusTool" Grid.Column="2" Text="Pencil" VerticalAlignment="Center" FontSize="12"
+                       AutomationProperties.Name="Active tool" AutomationProperties.LiveSetting="Assertive"/>
+            <TextBlock x:Name="StatusSelection" Grid.Column="3" Text="" VerticalAlignment="Center" FontSize="12"
+                       AutomationProperties.Name="Selection info" AutomationProperties.LiveSetting="Polite"/>
             <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                 <TextBlock x:Name="StatusZoom" Text="100%" VerticalAlignment="Center" FontSize="12"/>
                 <Slider x:Name="ZoomSlider" Minimum="10" Maximum="800" Value="100" Width="150"
-                        VerticalAlignment="Center" ValueChanged="ZoomSlider_ValueChanged"/>
+                        VerticalAlignment="Center" ValueChanged="ZoomSlider_ValueChanged" AutomationProperties.Name="Zoom level"/>
             </StackPanel>
         </Grid>
     </Grid>
