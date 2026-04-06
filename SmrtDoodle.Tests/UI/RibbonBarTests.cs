@@ -95,18 +95,18 @@ public class RibbonBarTests
     #region Tool Buttons
 
     [DataTestMethod]
-    [DataRow("BtnPencil", "Pencil", "Pencil")]
-    [DataRow("BtnBrush", "Brush", "Brush")]
-    [DataRow("BtnEraser", "Eraser", "Eraser")]
-    [DataRow("BtnFill", "Fill", "Fill")]
-    [DataRow("BtnText", "Text", "Text")]
-    [DataRow("BtnEyedropper", "Eyedropper", "Color Picker")]
-    [DataRow("BtnLine", "Line", "Line")]
-    [DataRow("BtnCurve", "Curve", "Curve")]
-    [DataRow("BtnShape", "Shape", "Shape")]
-    [DataRow("BtnSelect", "Selection", "Select")]
-    [DataRow("BtnFreeSelect", "FreeFormSelection", "Free-form Select")]
-    [DataRow("BtnMagnifier", "Magnifier", "Magnifier")]
+    [DataRow("BtnPencil", "Pencil", "Pencil (P)")]
+    [DataRow("BtnBrush", "Brush", "Brush (B)")]
+    [DataRow("BtnEraser", "Eraser", "Eraser (E)")]
+    [DataRow("BtnFill", "Fill", "Fill (G)")]
+    [DataRow("BtnText", "Text", "Text (T)")]
+    [DataRow("BtnEyedropper", "Eyedropper", "Color Picker (I)")]
+    [DataRow("BtnLine", "Line", "Line (L)")]
+    [DataRow("BtnCurve", "Curve", "Curve (C)")]
+    [DataRow("BtnShape", "Shape", "Shape (H)")]
+    [DataRow("BtnSelect", "Selection", "Select (S)")]
+    [DataRow("BtnFreeSelect", "FreeFormSelection", "Free-form Select (F)")]
+    [DataRow("BtnMagnifier", "Magnifier", "Magnifier (M)")]
     public void ToolButton_HasCorrectTagAndTooltip(string name, string expectedTag, string expectedTooltip)
     {
         var btn = GetByName(name);
@@ -145,7 +145,8 @@ public class RibbonBarTests
         var toolButtons = new[]
         {
             "BtnPencil", "BtnBrush", "BtnEraser", "BtnFill", "BtnText", "BtnEyedropper",
-            "BtnLine", "BtnCurve", "BtnShape", "BtnSelect", "BtnFreeSelect", "BtnMagnifier"
+            "BtnLine", "BtnCurve", "BtnShape", "BtnSelect", "BtnFreeSelect", "BtnMagnifier",
+            "BtnGradient", "BtnBlur", "BtnSharpen", "BtnSmudge", "BtnCloneStamp", "BtnPatternFill", "BtnMeasure"
         };
         Assert.AreEqual(toolValues.Count, toolButtons.Length,
             $"Expected {toolValues.Count} tool buttons (DrawingTool enum minus Crop), found {toolButtons.Length}");
@@ -527,7 +528,7 @@ public class MenuBarTests
     public void MenuBar_HasFiveMenus()
     {
         var menus = _xamlDoc!.Descendants(_defaultNs + "MenuBarItem").ToList();
-        Assert.AreEqual(5, menus.Count, "Expected 5 menus: File, Edit, Image, View, Layers");
+        Assert.AreEqual(6, menus.Count, "Expected 6 menus: File, Edit, Image, View, Layers, Help");
     }
 
     [DataTestMethod]
@@ -536,6 +537,7 @@ public class MenuBarTests
     [DataRow("Image")]
     [DataRow("View")]
     [DataRow("Layers")]
+    [DataRow("Help")]
     public void MenuBar_HasExpectedMenu(string title)
     {
         var menu = _xamlDoc!.Descendants(_defaultNs + "MenuBarItem")
@@ -1094,6 +1096,13 @@ public class ToolModelContractTests
             [DrawingTool.Selection] = new SelectionTool(),
             [DrawingTool.FreeFormSelection] = new FreeFormSelectionTool(),
             [DrawingTool.Magnifier] = new MagnifierTool(),
+            [DrawingTool.Gradient] = new GradientTool(),
+            [DrawingTool.Blur] = new BlurTool(),
+            [DrawingTool.Sharpen] = new SharpenTool(),
+            [DrawingTool.Smudge] = new SmudgeTool(),
+            [DrawingTool.CloneStamp] = new CloneStampTool(),
+            [DrawingTool.PatternFill] = new PatternFillTool(),
+            [DrawingTool.Measure] = new MeasureTool(),
         };
 
         foreach (var dt in Enum.GetValues<DrawingTool>())

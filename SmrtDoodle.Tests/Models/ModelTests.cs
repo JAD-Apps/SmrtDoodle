@@ -107,7 +107,7 @@ public class EnumTests
     public void BlendMode_HasExpectedValues()
     {
         var values = Enum.GetValues<BlendMode>();
-        Assert.AreEqual(4, values.Length);
+        Assert.AreEqual(25, values.Length);
     }
 
     [TestMethod]

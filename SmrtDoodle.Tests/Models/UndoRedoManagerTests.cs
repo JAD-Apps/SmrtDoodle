@@ -161,6 +161,7 @@ public class UndoRedoManagerTests
     private class MockUndoAction : IUndoRedoAction
     {
         public string Description { get; }
+        public long EstimatedBytes { get; set; }
         public int UndoCount { get; private set; }
         public int RedoCount { get; private set; }
         public bool IsDisposed { get; private set; }

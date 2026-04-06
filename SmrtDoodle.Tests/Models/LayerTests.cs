@@ -17,6 +17,12 @@ public class LayerTests
         Assert.AreEqual(BlendMode.Normal, layer.BlendMode);
         Assert.IsNull(layer.Bitmap);
         Assert.IsFalse(string.IsNullOrEmpty(layer.Id));
+        Assert.IsNull(layer.ParentGroupId);
+        Assert.IsNull(layer.MaskBitmap);
+        Assert.IsFalse(layer.IsMaskEnabled);
+        Assert.IsFalse(layer.IsEditingMask);
+        Assert.IsNotNull(layer.Effects);
+        Assert.AreEqual(0, layer.Effects.Count);
     }
 
     [TestMethod]
@@ -51,5 +57,24 @@ public class LayerTests
         var layer = new Layer("Test");
         layer.Dispose();
         layer.Dispose(); // Should not throw
+    }
+
+    [TestMethod]
+    public void Layer_CanSetParentGroupId()
+    {
+        var layer = new Layer("Child");
+        var group = new LayerGroup("Parent");
+        layer.ParentGroupId = group.Id;
+        Assert.AreEqual(group.Id, layer.ParentGroupId);
+    }
+
+    [TestMethod]
+    public void Layer_CanAddEffects()
+    {
+        var layer = new Layer("FX Layer");
+        layer.Effects.Add(new LayerEffect { Type = LayerEffectType.DropShadow, BlurRadius = 10 });
+        layer.Effects.Add(new LayerEffect { Type = LayerEffectType.Stroke, StrokeWidth = 2 });
+        Assert.AreEqual(2, layer.Effects.Count);
+        Assert.AreEqual(LayerEffectType.DropShadow, layer.Effects[0].Type);
     }
 }

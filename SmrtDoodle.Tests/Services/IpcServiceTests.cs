@@ -107,4 +107,28 @@ public class IpcServiceTests
         Assert.IsTrue(svc.IsLaunchedFromSmrtPad);
         Assert.IsNull(svc.TempFilePath);
     }
+
+    [TestMethod]
+    public async Task NotifyImageReadyAsync_NoPipeServer_ReturnsFalse()
+    {
+        var svc = new IpcService();
+        var result = await svc.NotifyImageReadyAsync(@"C:\test.png");
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public async Task WaitForCommandAsync_Cancelled_ReturnsNull()
+    {
+        var svc = new IpcService();
+        using var cts = new CancellationTokenSource(100);
+        var result = await svc.WaitForCommandAsync(cts.Token);
+        Assert.IsNull(result);
+    }
+
+    [TestMethod]
+    public void CleanupOrphanedTempFiles_NoDirectory_NoException()
+    {
+        // Should not throw even if directory doesn't exist
+        IpcService.CleanupOrphanedTempFiles();
+    }
 }
