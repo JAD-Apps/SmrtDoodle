@@ -4,20 +4,21 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
-  IgnorableNamespaces="uap rescap systemai">
+  IgnorableNamespaces="uap uap3 rescap systemai">
 
   <Identity
     Name="f7664df1-dcdd-4dd1-b6f7-fdcca16a8206"
-    Publisher="CN=JohnD"
-    Version="1.0.0.0" />
+    Publisher="CN=2B43AD1A-273D-402E-A9A5-FF23C52C75B9, O=JAD Apps"
+    Version="0.5.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="f7664df1-dcdd-4dd1-b6f7-fdcca16a8206" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>SmrtDoodle (Package)</DisplayName>
-    <PublisherDisplayName>JohnD</PublisherDisplayName>
+    <DisplayName>SmrtDoodle</DisplayName>
+    <PublisherDisplayName>JAD Apps</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
 
@@ -35,14 +36,66 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="SmrtDoodle (Package)"
-        Description="SmrtDoodle (Package)"
+        DisplayName="SmrtDoodle"
+        Description="A professional image editor for Windows with layers, blend modes, AI-powered tools, and full PSD support."
         BackgroundColor="transparent"
         Square150x150Logo="Images\Square150x150Logo.png"
         Square44x44Logo="Images\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png" />
+        <uap:DefaultTile Wide310x150Logo="Images\Wide310x150Logo.png" Square71x71Logo="Images\SmallTile.png" Square310x310Logo="Images\LargeTile.png" ShortName="SmrtDoodle" />
         <uap:SplashScreen Image="Images\SplashScreen.png" />
       </uap:VisualElements>
+
+      <Extensions>
+        <!-- .sdd native project format -->
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="smrtdoodle-project">
+            <uap:SupportedFileTypes>
+              <uap:FileType>.sdd</uap:FileType>
+            </uap:SupportedFileTypes>
+            <uap:DisplayName>SmrtDoodle Project</uap:DisplayName>
+            <uap:Logo>Images\StoreLogo.png</uap:Logo>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+
+        <!-- PSD format -->
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="photoshop-files">
+            <uap:SupportedFileTypes>
+              <uap:FileType>.psd</uap:FileType>
+              <uap:FileType>.psdt</uap:FileType>
+            </uap:SupportedFileTypes>
+            <uap:DisplayName>Photoshop Document</uap:DisplayName>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+
+        <!-- Common image formats -->
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="image-files">
+            <uap:SupportedFileTypes>
+              <uap:FileType>.png</uap:FileType>
+              <uap:FileType>.jpg</uap:FileType>
+              <uap:FileType>.jpeg</uap:FileType>
+              <uap:FileType>.bmp</uap:FileType>
+              <uap:FileType>.gif</uap:FileType>
+              <uap:FileType>.tiff</uap:FileType>
+              <uap:FileType>.tif</uap:FileType>
+              <uap:FileType>.webp</uap:FileType>
+              <uap:FileType>.ico</uap:FileType>
+              <uap:FileType>.svg</uap:FileType>
+              <uap:FileType>.tga</uap:FileType>
+              <uap:FileType>.dds</uap:FileType>
+            </uap:SupportedFileTypes>
+            <uap:DisplayName>Image File</uap:DisplayName>
+          </uap:FileTypeAssociation>
+        </uap:Extension>
+
+        <!-- URI Protocol -->
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="smrtdoodle">
+            <uap:DisplayName>SmrtDoodle Protocol</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
 
