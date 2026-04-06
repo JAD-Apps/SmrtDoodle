@@ -14,7 +14,14 @@ public enum DrawingTool
     Selection,
     FreeFormSelection,
     Crop,
-    Magnifier
+    Magnifier,
+    Gradient,
+    Blur,
+    Sharpen,
+    Smudge,
+    CloneStamp,
+    PatternFill,
+    Measure
 }
 
 public enum ShapeType
@@ -42,10 +49,42 @@ public enum SelectionMode
 
 public enum BlendMode
 {
+    // Normal group
     Normal,
+    Dissolve,
+
+    // Darken group
+    Darken,
     Multiply,
+    ColorBurn,
+    LinearBurn,
+    DarkerColor,
+
+    // Lighten group
+    Lighten,
     Screen,
-    Overlay
+    ColorDodge,
+    LinearDodge,
+    LighterColor,
+
+    // Contrast group
+    Overlay,
+    SoftLight,
+    HardLight,
+    VividLight,
+    LinearLight,
+    PinLight,
+    HardMix,
+
+    // Inversion group
+    Difference,
+    Exclusion,
+
+    // Component group
+    Hue,
+    Saturation,
+    Color,
+    Luminosity
 }
 
 public enum ShapeFillMode
