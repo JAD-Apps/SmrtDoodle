@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="AppTitle" xml:space="preserve"><value>SmrtDoodle</value></data>
+  <data name="Menu_File" xml:space="preserve"><value>Datei</value></data>
+  <data name="Menu_File_New" xml:space="preserve"><value>Neu</value></data>
+  <data name="Menu_File_Open" xml:space="preserve"><value>Öffnen</value></data>
+  <data name="Menu_File_Save" xml:space="preserve"><value>Speichern</value></data>
+  <data name="Menu_File_SaveAs" xml:space="preserve"><value>Speichern unter</value></data>
+  <data name="Menu_File_Print" xml:space="preserve"><value>Drucken</value></data>
+  <data name="Menu_File_Exit" xml:space="preserve"><value>Beenden</value></data>
+  <data name="Menu_Edit" xml:space="preserve"><value>Bearbeiten</value></data>
+  <data name="Menu_Edit_Undo" xml:space="preserve"><value>Rückgängig</value></data>
+  <data name="Menu_Edit_Redo" xml:space="preserve"><value>Wiederholen</value></data>
+  <data name="Menu_Edit_Cut" xml:space="preserve"><value>Ausschneiden</value></data>
+  <data name="Menu_Edit_Copy" xml:space="preserve"><value>Kopieren</value></data>
+  <data name="Menu_Edit_Paste" xml:space="preserve"><value>Einfügen</value></data>
+  <data name="Menu_Edit_Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Menu_Edit_SelectAll" xml:space="preserve"><value>Alles auswählen</value></data>
+  <data name="Menu_View" xml:space="preserve"><value>Ansicht</value></data>
+  <data name="Menu_View_ZoomIn" xml:space="preserve"><value>Vergrößern</value></data>
+  <data name="Menu_View_ZoomOut" xml:space="preserve"><value>Verkleinern</value></data>
+  <data name="Menu_Image" xml:space="preserve"><value>Bild</value></data>
+  <data name="Menu_Image_Resize" xml:space="preserve"><value>Größe ändern</value></data>
+  <data name="Menu_Layer" xml:space="preserve"><value>Ebene</value></data>
+  <data name="Menu_Layer_AddNew" xml:space="preserve"><value>Neue Ebene hinzufügen</value></data>
+  <data name="Menu_Layer_Delete" xml:space="preserve"><value>Ebene löschen</value></data>
+  <data name="Tool_Pencil" xml:space="preserve"><value>Bleistift</value></data>
+  <data name="Tool_Brush" xml:space="preserve"><value>Pinsel</value></data>
+  <data name="Tool_Eraser" xml:space="preserve"><value>Radierer</value></data>
+  <data name="Tool_Fill" xml:space="preserve"><value>Füllen</value></data>
+  <data name="Tool_Text" xml:space="preserve"><value>Text</value></data>
+  <data name="Tool_Gradient" xml:space="preserve"><value>Verlauf</value></data>
+  <data name="Tool_Blur" xml:space="preserve"><value>Weichzeichnen</value></data>
+  <data name="Tool_Sharpen" xml:space="preserve"><value>Scharfzeichnen</value></data>
+  <data name="LayerPanel_Header" xml:space="preserve"><value>Ebenen</value></data>
+  <data name="LayerPanel_Opacity" xml:space="preserve"><value>Deckkraft</value></data>
+  <data name="Common_OK" xml:space="preserve"><value>OK</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Common_Save" xml:space="preserve"><value>Speichern</value></data>
+</root>

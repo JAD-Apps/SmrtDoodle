@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- App Title -->
+  <data name="AppTitle" xml:space="preserve"><value>SmrtDoodle</value></data>
+
+  <!-- Menu - File -->
+  <data name="Menu_File" xml:space="preserve"><value>File</value></data>
+  <data name="Menu_File_New" xml:space="preserve"><value>New</value></data>
+  <data name="Menu_File_Open" xml:space="preserve"><value>Open</value></data>
+  <data name="Menu_File_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Menu_File_SaveAs" xml:space="preserve"><value>Save As</value></data>
+  <data name="Menu_File_Print" xml:space="preserve"><value>Print</value></data>
+  <data name="Menu_File_Exit" xml:space="preserve"><value>Exit</value></data>
+
+  <!-- Menu - Edit -->
+  <data name="Menu_Edit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Menu_Edit_Undo" xml:space="preserve"><value>Undo</value></data>
+  <data name="Menu_Edit_Redo" xml:space="preserve"><value>Redo</value></data>
+  <data name="Menu_Edit_Cut" xml:space="preserve"><value>Cut</value></data>
+  <data name="Menu_Edit_Copy" xml:space="preserve"><value>Copy</value></data>
+  <data name="Menu_Edit_Paste" xml:space="preserve"><value>Paste</value></data>
+  <data name="Menu_Edit_Delete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Menu_Edit_SelectAll" xml:space="preserve"><value>Select All</value></data>
+  <data name="Menu_Edit_DeselectAll" xml:space="preserve"><value>Deselect All</value></data>
+
+  <!-- Menu - View -->
+  <data name="Menu_View" xml:space="preserve"><value>View</value></data>
+  <data name="Menu_View_ZoomIn" xml:space="preserve"><value>Zoom In</value></data>
+  <data name="Menu_View_ZoomOut" xml:space="preserve"><value>Zoom Out</value></data>
+  <data name="Menu_View_FitToWindow" xml:space="preserve"><value>Fit to Window</value></data>
+  <data name="Menu_View_ActualSize" xml:space="preserve"><value>Actual Size (100%)</value></data>
+  <data name="Menu_View_ShowGrid" xml:space="preserve"><value>Toggle Grid</value></data>
+  <data name="Menu_View_ShowRulers" xml:space="preserve"><value>Toggle Rulers</value></data>
+
+  <!-- Menu - Image -->
+  <data name="Menu_Image" xml:space="preserve"><value>Image</value></data>
+  <data name="Menu_Image_Resize" xml:space="preserve"><value>Resize</value></data>
+  <data name="Menu_Image_CanvasSize" xml:space="preserve"><value>Canvas Size</value></data>
+  <data name="Menu_Image_Crop" xml:space="preserve"><value>Crop to Selection</value></data>
+  <data name="Menu_Image_RotateCW" xml:space="preserve"><value>Rotate 90° CW</value></data>
+  <data name="Menu_Image_RotateCCW" xml:space="preserve"><value>Rotate 90° CCW</value></data>
+  <data name="Menu_Image_FlipH" xml:space="preserve"><value>Flip Horizontal</value></data>
+  <data name="Menu_Image_FlipV" xml:space="preserve"><value>Flip Vertical</value></data>
+
+  <!-- Menu - Layer -->
+  <data name="Menu_Layer" xml:space="preserve"><value>Layer</value></data>
+  <data name="Menu_Layer_AddNew" xml:space="preserve"><value>Add New Layer</value></data>
+  <data name="Menu_Layer_Duplicate" xml:space="preserve"><value>Duplicate Layer</value></data>
+  <data name="Menu_Layer_Delete" xml:space="preserve"><value>Delete Layer</value></data>
+  <data name="Menu_Layer_MergeDown" xml:space="preserve"><value>Merge Down</value></data>
+  <data name="Menu_Layer_FlattenImage" xml:space="preserve"><value>Flatten Image</value></data>
+
+  <!-- Tools -->
+  <data name="Tool_Pencil" xml:space="preserve"><value>Pencil</value></data>
+  <data name="Tool_Brush" xml:space="preserve"><value>Brush</value></data>
+  <data name="Tool_Eraser" xml:space="preserve"><value>Eraser</value></data>
+  <data name="Tool_Fill" xml:space="preserve"><value>Fill</value></data>
+  <data name="Tool_Text" xml:space="preserve"><value>Text</value></data>
+  <data name="Tool_Eyedropper" xml:space="preserve"><value>Color Picker</value></data>
+  <data name="Tool_Line" xml:space="preserve"><value>Line</value></data>
+  <data name="Tool_Curve" xml:space="preserve"><value>Curve</value></data>
+  <data name="Tool_Shape" xml:space="preserve"><value>Shape</value></data>
+  <data name="Tool_Selection" xml:space="preserve"><value>Select</value></data>
+  <data name="Tool_FreeFormSelection" xml:space="preserve"><value>Free-form Select</value></data>
+  <data name="Tool_Magnifier" xml:space="preserve"><value>Magnifier</value></data>
+  <data name="Tool_Gradient" xml:space="preserve"><value>Gradient</value></data>
+  <data name="Tool_Blur" xml:space="preserve"><value>Blur</value></data>
+  <data name="Tool_Sharpen" xml:space="preserve"><value>Sharpen</value></data>
+  <data name="Tool_Smudge" xml:space="preserve"><value>Smudge</value></data>
+  <data name="Tool_CloneStamp" xml:space="preserve"><value>Clone Stamp</value></data>
+  <data name="Tool_PatternFill" xml:space="preserve"><value>Pattern Fill</value></data>
+  <data name="Tool_Measure" xml:space="preserve"><value>Measure</value></data>
+
+  <!-- Ribbon Labels -->
+  <data name="Ribbon_Tools" xml:space="preserve"><value>Tools</value></data>
+  <data name="Ribbon_Brush" xml:space="preserve"><value>Brush</value></data>
+  <data name="Ribbon_Colors" xml:space="preserve"><value>Colors</value></data>
+  <data name="Ribbon_BrushSize" xml:space="preserve"><value>Size</value></data>
+  <data name="Ribbon_BrushStyle" xml:space="preserve"><value>Style</value></data>
+
+  <!-- Layer Panel -->
+  <data name="LayerPanel_Header" xml:space="preserve"><value>Layers</value></data>
+  <data name="LayerPanel_BlendMode" xml:space="preserve"><value>Blend</value></data>
+  <data name="LayerPanel_Opacity" xml:space="preserve"><value>Opacity</value></data>
+  <data name="LayerPanel_AddLayer" xml:space="preserve"><value>Add</value></data>
+  <data name="LayerPanel_DeleteLayer" xml:space="preserve"><value>Delete</value></data>
+  <data name="LayerPanel_MoveUp" xml:space="preserve"><value>Up</value></data>
+  <data name="LayerPanel_MoveDown" xml:space="preserve"><value>Down</value></data>
+  <data name="LayerPanel_Rename" xml:space="preserve"><value>Rename</value></data>
+  <data name="LayerPanel_Lock" xml:space="preserve"><value>Lock</value></data>
+  <data name="LayerPanel_Unlock" xml:space="preserve"><value>Unlock</value></data>
+  <data name="LayerPanel_Duplicate" xml:space="preserve"><value>Duplicate</value></data>
+  <data name="LayerPanel_MergeDown" xml:space="preserve"><value>Merge Down</value></data>
+  <data name="LayerPanel_FlattenImage" xml:space="preserve"><value>Flatten Image</value></data>
+
+  <!-- Status Bar -->
+  <data name="Status_Position" xml:space="preserve"><value>Position:</value></data>
+  <data name="Status_CanvasSize" xml:space="preserve"><value>{0} x {1} px</value></data>
+  <data name="Status_Zoom" xml:space="preserve"><value>{0}%</value></data>
+
+  <!-- Dialogs -->
+  <data name="Dialog_Resize_Title" xml:space="preserve"><value>Resize Image</value></data>
+  <data name="Dialog_Resize_Width" xml:space="preserve"><value>Width:</value></data>
+  <data name="Dialog_Resize_Height" xml:space="preserve"><value>Height:</value></data>
+  <data name="Dialog_Resize_MaintainAspect" xml:space="preserve"><value>Maintain aspect ratio</value></data>
+  <data name="Dialog_CanvasSize_Title" xml:space="preserve"><value>Canvas Properties</value></data>
+  <data name="Dialog_ColorPicker_Title" xml:space="preserve"><value>Choose Color</value></data>
+  <data name="Dialog_RenameLayer_Title" xml:space="preserve"><value>Rename Layer</value></data>
+  <data name="Dialog_RenameLayer_Prompt" xml:space="preserve"><value>Enter new layer name:</value></data>
+  <data name="Dialog_Text_Title" xml:space="preserve"><value>Add Text</value></data>
+  <data name="Dialog_UnsavedChanges_Title" xml:space="preserve"><value>Unsaved Changes</value></data>
+  <data name="Dialog_UnsavedChanges_Message" xml:space="preserve"><value>You have unsaved changes. Save before closing?</value></data>
+
+  <!-- Common -->
+  <data name="Common_OK" xml:space="preserve"><value>OK</value></data>
+  <data name="Common_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Common_Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Common_No" xml:space="preserve"><value>No</value></data>
+  <data name="Common_Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Common_DontSave" xml:space="preserve"><value>Don't Save</value></data>
+
+  <!-- Blend Modes -->
+  <data name="BlendMode_Normal" xml:space="preserve"><value>Normal</value></data>
+  <data name="BlendMode_Dissolve" xml:space="preserve"><value>Dissolve</value></data>
+  <data name="BlendMode_Multiply" xml:space="preserve"><value>Multiply</value></data>
+  <data name="BlendMode_Screen" xml:space="preserve"><value>Screen</value></data>
+  <data name="BlendMode_Overlay" xml:space="preserve"><value>Overlay</value></data>
+  <data name="BlendMode_Darken" xml:space="preserve"><value>Darken</value></data>
+  <data name="BlendMode_Lighten" xml:space="preserve"><value>Lighten</value></data>
+  <data name="BlendMode_ColorDodge" xml:space="preserve"><value>Color Dodge</value></data>
+  <data name="BlendMode_ColorBurn" xml:space="preserve"><value>Color Burn</value></data>
+  <data name="BlendMode_HardLight" xml:space="preserve"><value>Hard Light</value></data>
+  <data name="BlendMode_SoftLight" xml:space="preserve"><value>Soft Light</value></data>
+  <data name="BlendMode_Difference" xml:space="preserve"><value>Difference</value></data>
+  <data name="BlendMode_Exclusion" xml:space="preserve"><value>Exclusion</value></data>
+  <data name="BlendMode_Hue" xml:space="preserve"><value>Hue</value></data>
+  <data name="BlendMode_Saturation" xml:space="preserve"><value>Saturation</value></data>
+  <data name="BlendMode_Color" xml:space="preserve"><value>Color</value></data>
+  <data name="BlendMode_Luminosity" xml:space="preserve"><value>Luminosity</value></data>
+</root>

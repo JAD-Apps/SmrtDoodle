@@ -1,0 +1,100 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- High Contrast theme overrides for SmrtDoodle -->
+    <!-- These resources ensure all custom UI elements remain visible under Windows High Contrast themes -->
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="HighContrast">
+            <!-- Canvas border: ensures selection/tool outlines are visible -->
+            <SolidColorBrush x:Key="CanvasBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+            <SolidColorBrush x:Key="CanvasBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+
+            <!-- Selection rectangle overlay -->
+            <SolidColorBrush x:Key="SelectionBorderBrush" Color="{ThemeResource SystemColorHighlightColor}"/>
+            <x:Double x:Key="SelectionBorderThickness">3</x:Double>
+
+            <!-- Tool button active indicator -->
+            <SolidColorBrush x:Key="ActiveToolHighlightBrush" Color="{ThemeResource SystemColorHighlightColor}"/>
+            <SolidColorBrush x:Key="ActiveToolForegroundBrush" Color="{ThemeResource SystemColorHighlightTextColor}"/>
+
+            <!-- Layer panel items -->
+            <SolidColorBrush x:Key="LayerItemSelectedBrush" Color="{ThemeResource SystemColorHighlightColor}"/>
+            <SolidColorBrush x:Key="LayerItemTextBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+
+            <!-- Status bar -->
+            <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}"/>
+            <SolidColorBrush x:Key="StatusBarForegroundBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+
+            <!-- Ruler -->
+            <SolidColorBrush x:Key="RulerBackgroundBrush" Color="{ThemeResource SystemColorButtonFaceColor}"/>
+            <SolidColorBrush x:Key="RulerForegroundBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+            <SolidColorBrush x:Key="RulerTickBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+
+            <!-- Grid overlay -->
+            <SolidColorBrush x:Key="GridLineBrush" Color="{ThemeResource SystemColorGrayTextColor}"/>
+
+            <!-- Color palette swatch border -->
+            <SolidColorBrush x:Key="PaletteSwatchBorderBrush" Color="{ThemeResource SystemColorWindowTextColor}"/>
+            <x:Double x:Key="PaletteSwatchBorderThickness">2</x:Double>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Default">
+            <SolidColorBrush x:Key="CanvasBorderBrush" Color="#CCCCCC"/>
+            <SolidColorBrush x:Key="CanvasBackgroundBrush" Color="#F5F5F5"/>
+            <SolidColorBrush x:Key="SelectionBorderBrush" Color="#0078D4"/>
+            <x:Double x:Key="SelectionBorderThickness">1</x:Double>
+            <SolidColorBrush x:Key="ActiveToolHighlightBrush" Color="#0078D4"/>
+            <SolidColorBrush x:Key="ActiveToolForegroundBrush" Color="White"/>
+            <SolidColorBrush x:Key="LayerItemSelectedBrush" Color="#E6F0FB"/>
+            <SolidColorBrush x:Key="LayerItemTextBrush" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#F0F0F0"/>
+            <SolidColorBrush x:Key="StatusBarForegroundBrush" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="RulerBackgroundBrush" Color="#FAFAFA"/>
+            <SolidColorBrush x:Key="RulerForegroundBrush" Color="#333333"/>
+            <SolidColorBrush x:Key="RulerTickBrush" Color="#999999"/>
+            <SolidColorBrush x:Key="GridLineBrush" Color="#E0E0E0"/>
+            <SolidColorBrush x:Key="PaletteSwatchBorderBrush" Color="#CCCCCC"/>
+            <x:Double x:Key="PaletteSwatchBorderThickness">1</x:Double>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="CanvasBorderBrush" Color="#CCCCCC"/>
+            <SolidColorBrush x:Key="CanvasBackgroundBrush" Color="#F5F5F5"/>
+            <SolidColorBrush x:Key="SelectionBorderBrush" Color="#0078D4"/>
+            <x:Double x:Key="SelectionBorderThickness">1</x:Double>
+            <SolidColorBrush x:Key="ActiveToolHighlightBrush" Color="#0078D4"/>
+            <SolidColorBrush x:Key="ActiveToolForegroundBrush" Color="White"/>
+            <SolidColorBrush x:Key="LayerItemSelectedBrush" Color="#E6F0FB"/>
+            <SolidColorBrush x:Key="LayerItemTextBrush" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#F0F0F0"/>
+            <SolidColorBrush x:Key="StatusBarForegroundBrush" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="RulerBackgroundBrush" Color="#FAFAFA"/>
+            <SolidColorBrush x:Key="RulerForegroundBrush" Color="#333333"/>
+            <SolidColorBrush x:Key="RulerTickBrush" Color="#999999"/>
+            <SolidColorBrush x:Key="GridLineBrush" Color="#E0E0E0"/>
+            <SolidColorBrush x:Key="PaletteSwatchBorderBrush" Color="#CCCCCC"/>
+            <x:Double x:Key="PaletteSwatchBorderThickness">1</x:Double>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="CanvasBorderBrush" Color="#555555"/>
+            <SolidColorBrush x:Key="CanvasBackgroundBrush" Color="#2D2D2D"/>
+            <SolidColorBrush x:Key="SelectionBorderBrush" Color="#60CDFF"/>
+            <x:Double x:Key="SelectionBorderThickness">1</x:Double>
+            <SolidColorBrush x:Key="ActiveToolHighlightBrush" Color="#60CDFF"/>
+            <SolidColorBrush x:Key="ActiveToolForegroundBrush" Color="#1A1A1A"/>
+            <SolidColorBrush x:Key="LayerItemSelectedBrush" Color="#1A3A5C"/>
+            <SolidColorBrush x:Key="LayerItemTextBrush" Color="#E0E0E0"/>
+            <SolidColorBrush x:Key="StatusBarBackgroundBrush" Color="#1F1F1F"/>
+            <SolidColorBrush x:Key="StatusBarForegroundBrush" Color="#E0E0E0"/>
+            <SolidColorBrush x:Key="RulerBackgroundBrush" Color="#252525"/>
+            <SolidColorBrush x:Key="RulerForegroundBrush" Color="#CCCCCC"/>
+            <SolidColorBrush x:Key="RulerTickBrush" Color="#666666"/>
+            <SolidColorBrush x:Key="GridLineBrush" Color="#404040"/>
+            <SolidColorBrush x:Key="PaletteSwatchBorderBrush" Color="#555555"/>
+            <x:Double x:Key="PaletteSwatchBorderThickness">1</x:Double>
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>
