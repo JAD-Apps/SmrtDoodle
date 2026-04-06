@@ -1,28 +1,55 @@
 # SmrtDoodle
 
-A lightweight drawing and painting application built with **WinUI 3** and **Win2D** for Windows.
+A professional image editor built with **WinUI 3** and **Win2D** for Windows.
 
-SmrtDoodle provides a familiar, intuitive canvas for quick sketches, diagrams, and image editing — with layer support, undo/redo, and a full set of drawing tools.
+SmrtDoodle provides a familiar, intuitive canvas for sketches, diagrams, photo editing, and digital painting — with full layer support, 25 Photoshop-compatible blend modes, AI-powered tools, and extensive file format support including PSD.
 
 ## Features
 
-- **Ribbon Toolbar** — SmrtPad-style grouped ribbon with Tools, Brush, Shapes, Selection, and Colors groups; fits at default window size without overflow
-- **Drawing Tools** — Pencil, Brush, Eraser, Line, Curve, and Shape tools with configurable stroke width and colors
+### Drawing & Painting
+- **19 Drawing Tools** — Pencil, Brush, Eraser, Line, Curve, Shape, Flood Fill, Text, Eyedropper, Magnifier, Gradient, Blur, Sharpen, Smudge, Clone Stamp, Pattern Fill, Measure, and two selection tools
 - **Brush Styles** — Normal, Calligraphy, Airbrush, Oil, Crayon, Marker, Natural Pencil, and Watercolor
-- **Shape Library** — Rectangle, Ellipse, Triangle, Star, Arrow, Heart, Lightning, and more with outline, fill, or combined modes
-- **Layers** — Multiple layers with visibility toggle, opacity control, blend modes, and duplication
-- **Selection** — Rectangular and free-form selection with move support and transparent selection mode
-- **Flood Fill** — Tolerance-based fill tool for quick coloring
-- **Text Tool** — Add text directly to the canvas
-- **Eyedropper** — Pick colors from the canvas
-- **Magnifier** — Left-click to zoom in, right-click to zoom out
-- **Undo / Redo** — Full bitmap-level undo/redo history (up to 50 steps)
-- **Clipboard** — Copy, cut, paste, paste from file, and paste as new image
-- **File I/O** — Open and save images in PNG, JPEG, BMP, and GIF formats
+- **Shape Library** — 12 shapes (Rectangle, Ellipse, Triangle, Star, Arrow, Heart, Lightning, and more) with outline, fill, or combined modes
+- **Gradient Tool** — Linear, Radial, Angle, Reflected, and Diamond gradient modes
+- **Retouch Tools** — Blur, Sharpen, and Smudge with adjustable strength
+- **Clone Stamp** — Alt+Click to set source, paint to duplicate regions
+- **Pattern Fill** — Checkerboard, Diagonal Lines, Dots, Crosshatch, and Brick patterns
+
+### Layers & Compositing
+- **Layer System** — Multiple layers with visibility, opacity, blend modes, grouping, masks, and effects
+- **25 Blend Modes** — Full Photoshop-compatible set: Normal, Dissolve, Multiply, Screen, Overlay, Soft Light, Hard Light, Color Dodge, Color Burn, and more
+- **Layer Effects** — Drop Shadow, Inner Shadow, Outer Glow, and Stroke
+- **Adjustment Layers** — Non-destructive Brightness/Contrast, Hue/Saturation, Color Balance, Levels, and Curves
+- **Layer Masks** — Grayscale mask compositing
+
+### File Format Support
+- **Native Format** — `.sdd` ZIP-based project format preserving layers, metadata, and thumbnail
+- **PSD/PSDT** — Import and export with layer preservation (name, visibility, opacity, blend modes)
+- **Image Formats** — PNG, JPEG, BMP, GIF, TIFF, WebP, ICO, SVG, TGA, DDS, and PDF via Magick.NET
+
+### AI Tools (Pro)
+- Remove Background, Upscale (2×/4×), Content-Aware Fill, Auto-Colorize, Style Transfer, and Noise Reduction
+- Powered by Windows AI platform (`systemAIModels` capability)
+
+### Performance & Canvas
+- **Tiled Rendering** — 512 px tile grid with viewport culling and dirty-tile tracking for 8K canvas support
+- **Optimized Undo/Redo** — Diff-based dirty-rect undo with 512 MB memory budget
 - **Canvas Settings** — Configurable width, height, DPI, background color, grid, and ruler
-- **Color Palette** — 28-color MS Paint-standard palette with primary/secondary color swatches and swap button
-- **Zoom** — Zoom in and out with checkerboard transparency preview
-- **SmrtPad Integration** — Launch from [SmrtPad](https://github.com/John-Donnelly/SmrtPad) to insert drawings directly into documents via IPC
+- **Zoom** — 10–800% with checkerboard transparency preview
+
+### Accessibility & Localization
+- **Screen Reader Support** — AutomationProperties on all interactive elements, landmark regions, and live announcements
+- **Keyboard Navigation** — AccessKey bindings for all 19 tools and full keyboard shortcut support
+- **High Contrast** — Four-theme high contrast resource dictionary
+- **8 Languages** — English, Spanish, German, French, Japanese, Chinese, Arabic, and Portuguese with RTL support
+
+### Integration
+- **Printing** — Native print dialog via PrintDocument with Fit to Page, Actual Size, and Custom DPI modes
+- **SmrtPad Integration** — Named-pipe IPC for inserting drawings directly into [SmrtPad](https://github.com/John-Donnelly/SmrtPad) documents
+- **Clipboard** — Copy, cut, paste, paste from file, and paste as new image
+- **Drag & Drop** — Drop image files onto the canvas to open them
+- **Color Palette** — 28-color MS Paint-standard palette with primary/secondary swatches and swap button
+- **Ribbon Toolbar** — SmrtPad-style grouped ribbon with Fluent Design theming
 
 ## Requirements
 
@@ -85,13 +112,22 @@ dotnet test SmrtDoodle.UITests -p:Platform=x64
 
 ```
 SmrtDoodle/
-├── Models/          # Data models (CanvasSettings, Layer, Enums, UndoRedoManager)
-├── Services/        # App services (FileService, ClipboardService, IpcService)
-├── Tools/           # Drawing tool implementations (ITool, BasicTools, AdvancedTools, CurveTool, FreeFormSelectionTool)
-├── Helpers/         # Converters and image utilities (FloodFill)
+├── Models/          # Data models (CanvasSettings, Layer, LayerGroup, AdjustmentLayer, LayerEffect, Enums, UndoRedoManager)
+├── Services/        # App services (FileService, ClipboardService, IpcService, AIService, FormatConversionService, ProjectService, PrintService, LicenseService, LoggingService, RecentFilesService)
+├── Tools/           # Drawing tool implementations (ITool, BasicTools, AdvancedTools, CurveTool, FreeFormSelectionTool, GradientTool, RetouchTools, CloneStampTool, PatternFillTool, MeasureTool)
+├── Helpers/         # Converters, image utilities, BlendModeHelper, RenderOptimization, BackgroundOperation
+├── Strings/         # Localized resource files (en-US, es-ES, de-DE, fr-FR, ja-JP, zh-CN, ar-SA, pt-BR)
+├── Themes/          # High contrast and theme resource dictionaries
 ├── Program.cs       # Custom WinUI 3 entry point (Bootstrap.Initialize / Shutdown)
-├── MainWindow.xaml  # Main application window
-└── App.xaml         # Application entry point
+├── MainWindow.xaml  # Main application window with ribbon toolbar
+└── App.xaml         # Application entry point with theme registration
+
+SmrtDoodle.Tests/
+├── Helpers/         # BlendModeHelper, RenderOptimization, TileGrid, BackgroundOperation, PerformanceBenchmark tests
+├── Models/          # Layer, LayerGroup, LayerEffect, AdjustmentLayer, CanvasSettings, UndoRedoManager tests
+├── Services/        # AIService, Clipboard, FormatConversion, IPC, License, Logging, Print, ProjectData, RecentFiles tests
+├── Tools/           # Tool property and functional tests
+└── UI/              # Accessibility, AI menu, high contrast, and ribbon bar tests
 
 SmrtDoodle.UITests/
 ├── Scripts/         # Deploy-Remote.ps1 — builds and copies to remote test machine via PS Remoting

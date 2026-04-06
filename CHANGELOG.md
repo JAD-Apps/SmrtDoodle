@@ -4,9 +4,122 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.7.0] - 2026-04-06
 
 ### Added
+
+- 538 unit tests covering all major subsystems (up from 130)
+- Performance benchmark tests for tiled rendering, memory estimation, and undo capacity
+- Comprehensive tool tests for all Phase 4 drawing tools (Gradient, Blur, Sharpen, Smudge, Clone Stamp, Pattern Fill, Measure)
+- Blend mode helper tests validating all 25 Photoshop-compatible blend channel formulas
+- Canvas settings, tile grid, and render optimization test suites
+- Tests for AI service, license service, logging, print, clipboard, IPC, format conversion, recent files, and project data services
+- Accessibility tests covering all 19 AccessKey bindings, AutomationProperties, landmarks, and high contrast themes
+- UI integration tests validating AI menu structure and ribbon bar
+
+### Changed
+
+- Updated README with full feature list reflecting all new capabilities
+- Organized project structure documentation to include new folders (Helpers, Themes, Strings, Tools)
+
+## [0.6.1] - 2026-04-06
+
+### Added
+
+- AI Tools submenu under Image menu with six operations gated behind Pro license: Remove Background, Upscale (2×/4×), Content-Aware Fill, Auto-Colorize, Style Transfer, and Noise Reduction
+- `AIService` infrastructure for Windows AI model integration with `systemAIModels` capability
+- Print system overhaul with `PrintDocument` and `PrintManagerInterop` for native system print dialog, plus fallback to OS temp-file handler
+- `PrintService` with scale modes: Fit to Page, Actual Size, and Custom DPI
+- Named-pipe IPC between SmrtDoodle and SmrtPad (`NotifyImageReadyAsync`, `WaitForCommandAsync`) with orphaned temp file cleanup on startup
+- SmrtPad insert confirmation dialog with AccentButtonStyle and icon
+
+### Changed
+
+- `IpcService` upgraded from command-line temp file to named-pipe protocol for bidirectional communication
+
+## [0.6.0] - 2026-04-06
+
+### Added
+
+- Full accessibility support with `AutomationProperties.Name` on all 19 tool buttons, canvas, layer panel, status bar, and menu items
+- `AccessKey` bindings for all 19 tools (P/B/E/G/T/I/L/C/H/S/F/M/D/U/R/X/N/A/W)
+- `AutomationProperties.LandmarkType` on five UI regions (Navigation, Main, Custom for layers/status/colors)
+- `AutomationProperties.LiveSetting` on status bar for screen reader announcements
+- High contrast theme support via `HighContrastResources.xaml` with 14 custom brushes across four themes (HighContrast, Default, Light, Dark)
+- Localization resource files for eight languages: en-US, es-ES, de-DE, fr-FR, ja-JP, zh-CN, ar-SA, and pt-BR
+- RTL layout support for Arabic, Hebrew, Farsi, and Urdu with per-element FlowDirection overrides
+
+## [0.5.1] - 2026-04-06
+
+### Added
+
+- `DirtyRectTracker` for spatial invalidation — only redraws changed canvas regions
+- `RenderThrottler` for framerate-capped rendering (configurable target FPS)
+- `TileGrid` tiled rendering engine with 512 px tiles, viewport culling, and dirty-tile tracking for 8K canvas support
+- `BackgroundOperation.RunAsync` helper for thread-safe background work with `DispatcherQueue` progress marshalling
+- `MemoryMonitor` with per-canvas memory estimation and low-memory detection
+- Store asset generation script (`Generate-StoreAssets.ps1`) for automated MSIX visual asset creation from base logo
+
+## [0.5.0] - 2026-04-06
+
+### Added
+
+- Updated package manifest: publisher identity (`CN=2B43AD1A-273D-402E-A9A5-FF23C52C75B9, O=JAD Apps`), proper display name, and app description
+- File type associations for `.sdd`, `.psd`, `.psdt`, and common image formats in package manifest
+- `smrtdoodle://` protocol handler registration
+- `STORE_LISTING.md` with full Microsoft Store listing content, feature highlights, system requirements, and privacy policy
+- `LicenseService` with `StoreContext` integration for Pro license checking and in-app purchase flow
+
+### Changed
+
+- Package version set to 0.5.0.0 (release candidate)
+- Publisher display name updated to "JAD Apps"
+
+## [0.4.1] - 2026-04-06
+
+### Added
+
+- Gradient tool with five modes: Linear, Radial, Angle, Reflected, and Diamond
+- Blur, Sharpen, and Smudge retouch tools with configurable strength
+- Clone Stamp tool with Alt+Click source selection and offset painting
+- Pattern Fill tool with five built-in patterns: Checkerboard, Diagonal Lines, Dots, Crosshatch, and Brick
+- Measure tool displaying distance, angle, and delta X/Y in the status bar
+- Live text editing with on-canvas TextBox overlay (commit on click-away)
+- Seven new tool buttons added to ribbon toolbar with unique AccessKey bindings
+
+## [0.4.0] - 2026-04-06
+
+### Added
+
+- `LayerGroup` model for layer folder organisation with `ParentGroupId` hierarchy
+- `AdjustmentLayer` for non-destructive Brightness/Contrast, Hue/Saturation, Color Balance, Levels, and Curves adjustments
+- `LayerEffect` model for Drop Shadow, Inner Shadow, Outer Glow, and Stroke effects with full parameter control
+- Layer masks (`MaskBitmap`) with grayscale compositing via `CanvasComposite.DestinationIn`
+- Expanded layer panel with inline rename, opacity slider, blend mode dropdown, and lock indicators
+
+## [0.3.1] - 2026-04-06
+
+### Added
+
+- Expanded `BlendMode` enum to 25 Photoshop-compatible modes: Normal, Dissolve, Darken, Multiply, ColorBurn, LinearBurn, DarkerColor, Lighten, Screen, ColorDodge, LinearDodge, LighterColor, Overlay, SoftLight, HardLight, VividLight, LinearLight, PinLight, HardMix, Difference, Exclusion, Hue, Saturation, Color, and Luminosity
+- `BlendModeHelper` with pixel-level compositing for all 25 blend modes, HSL conversion, and per-channel blend math
+- `LoggingService` with structured file logging and unhandled exception handler
+- Expanded `ImageHelpers` with `FloodFill` queue-based algorithm and `ImageTransforms` (FlipH, FlipV, Rotate90, Rotate180)
+
+### Changed
+
+- `UndoRedoManager` rewritten with diff-based dirty-rect undo — stores only changed pixel regions instead of full bitmap snapshots, with 512 MB memory budget and automatic history trimming
+- `FileService.ComposeLayers()` now applies per-layer blend modes via `BlendModeHelper`
+
+### Added (File Formats)
+
+- Magick.NET integration (`Magick.NET-Q16-AnyCPU` v14.11.1) for extended format support
+- `FormatConversionService` bridging Magick.NET and Win2D for format conversion
+- PSD/PSDT import with layer preservation (name, visibility, opacity, blend mode mapping)
+- PSD export with full layer metadata
+- TIFF, WebP, ICO, SVG, TGA, DDS, and PDF import/export support
+- `ProjectService` for native `.sdd` ZIP-based project format (JSON metadata + per-layer PNGs + thumbnail)
+- Expanded file dialogs with grouped format filters ("All Image Files", "Photoshop", "Common", etc.)
 
 - Comprehensive UI integration test suite (`SmrtDoodle.UITests`) using Appium / WinAppDriver targeting a remote Windows test machine via WinRM — covers brush controls, canvas interaction, color controls, context menus, layer panel, menu bar, selection/clipboard, shapes, status bar, tool buttons, view/zoom toggles, and edge-case/stress scenarios
 - `Deploy-Remote.ps1` script for automated build and remote deployment over PS Remoting; reads credentials from a `.env` file (not committed) or environment variables; supports `-UseBuildOutput` flag to deploy Debug build output instead of a self-contained publish
