@@ -17,6 +17,17 @@ public class Layer : IDisposable
     public BlendMode BlendMode { get; set; } = BlendMode.Normal;
     public CanvasRenderTarget? Bitmap { get; set; }
 
+    // Layer grouping
+    public string? ParentGroupId { get; set; }
+
+    // Layer mask (grayscale: white=visible, black=hidden)
+    public CanvasRenderTarget? MaskBitmap { get; set; }
+    public bool IsMaskEnabled { get; set; }
+    public bool IsEditingMask { get; set; }
+
+    // Layer effects
+    public List<LayerEffect> Effects { get; } = new();
+
     public Layer(string name)
     {
         Name = name;
@@ -43,7 +54,9 @@ public class Layer : IDisposable
         {
             IsVisible = IsVisible,
             Opacity = Opacity,
-            BlendMode = BlendMode
+            BlendMode = BlendMode,
+            ParentGroupId = ParentGroupId,
+            IsMaskEnabled = IsMaskEnabled
         };
         if (Bitmap != null)
         {
@@ -51,7 +64,27 @@ public class Layer : IDisposable
             using var ds = clone.Bitmap.CreateDrawingSession();
             ds.DrawImage(Bitmap);
         }
+        if (MaskBitmap != null)
+        {
+            clone.MaskBitmap = new CanvasRenderTarget(resourceCreator, (float)MaskBitmap.SizeInPixels.Width, (float)MaskBitmap.SizeInPixels.Height, MaskBitmap.Dpi);
+            using var ds = clone.MaskBitmap.CreateDrawingSession();
+            ds.DrawImage(MaskBitmap);
+        }
+        foreach (var effect in Effects)
+            clone.Effects.Add(effect.Clone());
         return clone;
+    }
+
+    /// <summary>
+    /// Initializes a white (fully visible) mask for this layer.
+    /// </summary>
+    public void InitializeMask(ICanvasResourceCreator resourceCreator, int width, int height, float dpi)
+    {
+        MaskBitmap?.Dispose();
+        MaskBitmap = new CanvasRenderTarget(resourceCreator, width, height, dpi);
+        using var ds = MaskBitmap.CreateDrawingSession();
+        ds.Clear(Microsoft.UI.Colors.White);
+        IsMaskEnabled = true;
     }
 
     public void Dispose()
@@ -60,6 +93,8 @@ public class Layer : IDisposable
         {
             Bitmap?.Dispose();
             Bitmap = null;
+            MaskBitmap?.Dispose();
+            MaskBitmap = null;
             _disposed = true;
         }
         GC.SuppressFinalize(this);
