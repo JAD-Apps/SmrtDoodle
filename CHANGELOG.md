@@ -4,6 +4,16 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.4] - 2026-04-07
+
+### Fixed
+
+- CanvasInteractionTests: skip `CanvasContainer_Exists` and `RulerCanvas_Exists` (Grid/Canvas controls lack UIA automation peers)
+- CanvasInteractionTests: eyedropper/magnifier assertions changed from `PrimaryColorBorder`/`SecondaryColorBorder` to `StatusTool`/`DrawingCanvas` (Border controls not in UIA tree)
+- ViewToggleAndZoomTests: replaced all `ClickMenuItem("View", "100%")` calls and `Value.Value` with `ClickViewMenu100Percent()` and `RangeValue.Value`
+- ViewToggleAndZoomTests: removed `RulerCanvas` assertions (Canvas controls lack automation peers)
+- EdgeCaseAndStressTests: replaced `ClickMenuItem("View", "100%")` and `PrimaryColorBorder` assertions
+
 ## [0.7.3] - 2026-04-07
 
 ### Fixed

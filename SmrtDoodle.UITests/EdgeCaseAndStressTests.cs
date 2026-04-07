@@ -137,8 +137,7 @@ public class EdgeCaseAndStressTests : AppiumTestBase
 
         Assert.IsNotNull(FindByAutomationId("DrawingCanvas"));
 
-        ClickMenuItem("View", "100%");
-        Thread.Sleep(200);
+        ClickViewMenu100Percent();
     }
 
     [TestMethod]
@@ -151,8 +150,7 @@ public class EdgeCaseAndStressTests : AppiumTestBase
 
         Assert.IsNotNull(FindByAutomationId("DrawingCanvas"));
 
-        ClickMenuItem("View", "100%");
-        Thread.Sleep(200);
+        ClickViewMenu100Percent();
     }
 
     [TestMethod]
@@ -473,8 +471,7 @@ public class EdgeCaseAndStressTests : AppiumTestBase
     public void Workflow_ZoomDrawZoomBackVerify()
     {
         ResetCanvas();
-        ClickMenuItem("View", "100%");
-        Thread.Sleep(200);
+        ClickViewMenu100Percent();
 
         // Zoom in
         ClickMenuItem("View", "Zoom In");
@@ -487,8 +484,7 @@ public class EdgeCaseAndStressTests : AppiumTestBase
         Thread.Sleep(200);
 
         // Zoom back to 100%
-        ClickMenuItem("View", "100%");
-        Thread.Sleep(300);
+        ClickViewMenu100Percent();
 
         Assert.AreEqual("100%", FindByAutomationId("StatusZoom").Text);
         Assert.IsNotNull(FindByAutomationId("DrawingCanvas"));
@@ -601,7 +597,7 @@ public class EdgeCaseAndStressTests : AppiumTestBase
             Thread.Sleep(20);
         }
 
-        Assert.IsNotNull(FindByAutomationId("PrimaryColorBorder"));
+        Assert.IsNotNull(FindByAutomationId("DrawingCanvas"));
     }
 
     #endregion
