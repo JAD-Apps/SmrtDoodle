@@ -4,6 +4,14 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.3] - 2026-04-07
+
+### Fixed
+
+- ToolButtonTests: tooltip assertions changed from `HelpText` to `Name` attribute (WinUI 3 does not expose `HelpText` via UIA)
+- ToolButtonTests: status bar expected values corrected — "Color Picker" not "Eyedropper", "Select" not "Selection", "Free-Form Select" not "FreeFormSelection"
+- MenuBarTests: replaced `ClickMenuItem("View", "100%")` with `ClickViewMenu100Percent()` to avoid `LayerOpacityText` ambiguity
+
 ## [0.7.2] - 2026-04-07
 
 ### Changed

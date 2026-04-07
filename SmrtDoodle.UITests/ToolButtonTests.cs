@@ -362,7 +362,7 @@ public class ToolButtonTests : AppiumTestBase
     public void SelectEyedropper_StatusBarShowsEyedropper()
     {
         SelectTool("BtnEyedropper");
-        AssertStatusText("StatusTool", "Eyedropper", "Eyedropper tool status");
+        AssertStatusText("StatusTool", "Color Picker", "Eyedropper tool status");
     }
 
     [TestMethod]
@@ -390,14 +390,14 @@ public class ToolButtonTests : AppiumTestBase
     public void SelectSelection_StatusBarShowsSelection()
     {
         SelectTool("BtnSelect");
-        AssertStatusText("StatusTool", "Selection", "Selection tool status");
+        AssertStatusText("StatusTool", "Select", "Selection tool status");
     }
 
     [TestMethod]
     public void SelectFreeFormSelection_StatusBarShowsFreeFormSelection()
     {
         SelectTool("BtnFreeSelect");
-        AssertStatusText("StatusTool", "FreeFormSelection", "Free-form selection tool status");
+        AssertStatusText("StatusTool", "Free-Form Select", "Free-form selection tool status");
     }
 
     [TestMethod]
@@ -415,96 +415,96 @@ public class ToolButtonTests : AppiumTestBase
     public void BtnPencil_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnPencil");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Pencil", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Pencil tool", name);
     }
 
     [TestMethod]
     public void BtnBrush_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnBrush");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Brush", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Brush tool", name);
     }
 
     [TestMethod]
     public void BtnEraser_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnEraser");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Eraser", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Eraser tool", name);
     }
 
     [TestMethod]
     public void BtnFill_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnFill");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Fill", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Fill tool", name);
     }
 
     [TestMethod]
     public void BtnText_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnText");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Text", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Text tool", name);
     }
 
     [TestMethod]
     public void BtnEyedropper_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnEyedropper");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Color Picker", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Eyedropper Color Picker tool", name);
     }
 
     [TestMethod]
     public void BtnLine_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnLine");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Line", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Line tool", name);
     }
 
     [TestMethod]
     public void BtnCurve_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnCurve");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Curve", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Curve tool", name);
     }
 
     [TestMethod]
     public void BtnShape_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnShape");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Shape", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Shape tool", name);
     }
 
     [TestMethod]
     public void BtnSelect_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnSelect");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Select", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Rectangle Selection tool", name);
     }
 
     [TestMethod]
     public void BtnFreeSelect_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnFreeSelect");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Free-form Select", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Free-form Selection tool", name);
     }
 
     [TestMethod]
     public void BtnMagnifier_HasCorrectTooltip()
     {
         var btn = FindByAutomationId("BtnMagnifier");
-        var tooltip = btn.GetAttribute("HelpText");
-        Assert.AreEqual("Magnifier", tooltip);
+        var name = btn.GetAttribute("Name");
+        Assert.AreEqual("Magnifier Zoom tool", name);
     }
 
     #endregion

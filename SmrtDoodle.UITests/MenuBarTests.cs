@@ -601,8 +601,7 @@ public class MenuBarTests : AppiumTestBase
         ResetCanvas();
 
         // Reset to 100% first
-        ClickMenuItem("View", "100%");
-        Thread.Sleep(300);
+        ClickViewMenu100Percent();
 
         var zoomBefore = FindByAutomationId("StatusZoom").Text;
 
@@ -617,8 +616,7 @@ public class MenuBarTests : AppiumTestBase
     public void ViewMenu_ZoomOut_UpdatesZoomStatus()
     {
         // Reset to 100%
-        ClickMenuItem("View", "100%");
-        Thread.Sleep(300);
+        ClickViewMenu100Percent();
 
         ClickMenuItem("View", "Zoom In");
         Thread.Sleep(200);
@@ -635,11 +633,12 @@ public class MenuBarTests : AppiumTestBase
     [TestMethod]
     public void ViewMenu_100Percent_ResetsZoom()
     {
-        ClickMenuItem("View", "Zoom In");
-        Thread.Sleep(200);
+        ResetCanvas();
 
-        ClickMenuItem("View", "100%");
-        Thread.Sleep(300);
+        ClickMenuItem("View", "Zoom In");
+        Thread.Sleep(500);
+
+        ClickViewMenu100Percent();
 
         var zoom = FindByAutomationId("StatusZoom").Text;
         Assert.AreEqual("100%", zoom);
