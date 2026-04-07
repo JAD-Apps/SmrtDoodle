@@ -413,12 +413,45 @@ public class ShapeControlTests : AppiumTestBase
 
     private static void SelectFillMode(string modeName)
     {
-        var combo = FindByAutomationId("FillModeCombo");
-        combo.Click();
-        Thread.Sleep(300);
+        for (int attempt = 1; attempt <= 5; attempt++)
+        {
+            try
+            {
+                var combo = FindByAutomationId("FillModeCombo");
+                // Click the canvas first to dismiss any residual popups
+                if (attempt > 1)
+                {
+                    var canvas = TryFindByAutomationId("DrawingCanvas");
+                    if (canvas != null)
+                    {
+                        canvas.Click();
+                        Thread.Sleep(300);
+                    }
+                }
+                combo.Click();
+                Thread.Sleep(500 + (attempt * 200));
 
-        var item = FindByName(modeName);
-        item.Click();
+                var item = TryFindByName(modeName);
+                if (item != null)
+                {
+                    item.Click();
+                    Thread.Sleep(200);
+                    return;
+                }
+                // Dismiss dropdown and retry
+                combo.SendKeys(OpenQA.Selenium.Keys.Escape);
+                Thread.Sleep(500);
+            }
+            catch (Exception)
+            {
+                Thread.Sleep(500);
+            }
+        }
+        // Final attempt - let it throw
+        var finalCombo = FindByAutomationId("FillModeCombo");
+        finalCombo.Click();
+        Thread.Sleep(1000);
+        FindByName(modeName).Click();
         Thread.Sleep(200);
     }
 

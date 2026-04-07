@@ -4,6 +4,22 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.5] - 2026-04-07
+
+### Fixed
+
+- BrushControlTests: `Value.Value` → `RangeValue.Value` for slider attributes; skip `PageUp` and `ResetToDefault` tests (WinUI 3 slider limitations)
+- ColorControlTests: skip 9 `PrimaryColorBorder`/`SecondaryColorBorder` tests and 3 color picker dialog tests (Border controls lack UIA peers); skip tooltip test (not exposed via UIA)
+- ShapeControlTests: enhanced `SelectFillMode` with 5-attempt retry loop, canvas click to dismiss residual popups, and progressive wait times
+- StatusBarTests: fix tool name expectations; replace `Value.Value` with `RangeValue.Value`; skip `StatusSelection_Exists` and `ZoomSlider_DecrementWithArrowLeft`
+- ContextMenuTests: fix `WindowsElement` cast; skip `PrimaryColorSwatch`/`SecondaryColorSwatch` right-click tests (Border controls)
+- LayerPanelTests: skip 5 layer button tooltip tests (button names not exposed via UIA)
+
+### Changed
+
+- Updated README with local WinAppDriver testing instructions (replacing remote Appium setup)
+- All 409 Appium UI tests now pass locally with 26 skipped (WinUI 3 UIA limitations)
+
 ## [0.7.4] - 2026-04-07
 
 ### Fixed

@@ -75,38 +75,32 @@ Unit tests run locally:
 dotnet test SmrtDoodle.Tests -p:Platform=x64
 ```
 
-UI integration tests require a Windows remote test machine running [Appium](https://appium.io/) with the `appium-windows-driver` plugin. See **Remote UI Testing** below.
+UI tests run locally using [WinAppDriver](https://github.com/microsoft/WinAppDriver) (included with Windows 10/11). See **Local UI Testing** below.
 
-## Remote UI Testing
+## Local UI Testing
 
-`SmrtDoodle.UITests` is an MSTest project that drives the app on a remote machine via WinRM + Appium.
+`SmrtDoodle.UITests` is an MSTest project with 409 Appium-based UI tests that drive the app locally via WinAppDriver.
 
 ### Prerequisites
 
-- Remote machine running Windows 10/11 with .NET 8 and Windows App SDK 1.8 installed
-- Appium 3.x + `appium-windows-driver` running on port 4723 on the remote machine
-- WinRM enabled on the remote machine (`winrm quickconfig`)
+- [WinAppDriver 1.2](https://github.com/microsoft/WinAppDriver/releases) installed (default: `C:\Program Files (x86)\Windows Application Driver\WinAppDriver.exe`)
+- Developer Mode enabled in Windows Settings
+- SmrtDoodle built for x64 Debug
 
-### Setup
-
-Create a `.env` file in the solution root (never committed — already in `.gitignore`):
-
-```
-UITEST_REMOTE_HOST=192.168.0.x
-UITEST_REMOTE_WINRM_USERNAME=YourUser
-UITEST_REMOTE_WINRM_PASSWORD=YourPassword
-UITEST_DEPLOY_CONFIGURATION=Debug
-```
-
-### Deploy and Run
+### Run
 
 ```powershell
-# Deploy the Debug build to the remote machine
-.\SmrtDoodle.UITests\Scripts\Deploy-Remote.ps1 -UseBuildOutput
+# Build the app first
+dotnet build SmrtDoodle -p:Platform=x64
 
-# Run UI tests (tests connect to the already-deployed app)
+# Run all UI tests (WinAppDriver starts automatically)
 dotnet test SmrtDoodle.UITests -p:Platform=x64
+
+# Run a specific test class
+dotnet test SmrtDoodle.UITests -p:Platform=x64 --filter "FullyQualifiedName~ToolButtonTests"
 ```
+
+The test base class automatically starts WinAppDriver, launches the app, and attaches to the window handle. No manual setup required.
 
 ## Project Structure
 
@@ -118,7 +112,7 @@ SmrtDoodle/
 ├── Helpers/         # Converters, image utilities, BlendModeHelper, RenderOptimization, BackgroundOperation
 ├── Strings/         # Localized resource files (en-US, es-ES, de-DE, fr-FR, ja-JP, zh-CN, ar-SA, pt-BR)
 ├── Themes/          # High contrast and theme resource dictionaries
-├── Program.cs       # Custom WinUI 3 entry point (Bootstrap.Initialize / Shutdown)
+├── Program.cs       # WinUI 3 entry point (self-contained, no Bootstrap required)
 ├── MainWindow.xaml  # Main application window with ribbon toolbar
 └── App.xaml         # Application entry point with theme registration
 
