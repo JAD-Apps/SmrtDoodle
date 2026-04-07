@@ -13,6 +13,8 @@
     <WindowsAppSdkBootstrapInitialize>false</WindowsAppSdkBootstrapInitialize>
     <WindowsAppSdkDeploymentManagerInitialize>false</WindowsAppSdkDeploymentManagerInitialize>
     <WindowsAppSdkUndockedRegFreeWinRTInitialize>false</WindowsAppSdkUndockedRegFreeWinRTInitialize>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSdkSelfContained>true</WindowsAppSdkSelfContained>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

@@ -100,11 +100,21 @@ public sealed partial class MainWindow : Window
 
     private void ApplyFlowDirection()
     {
-        var lang = Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride;
-        if (string.IsNullOrEmpty(lang))
+        string lang;
+        try
         {
-            var languages = Windows.Globalization.ApplicationLanguages.Languages;
-            lang = languages.Count > 0 ? languages[0] : "en-US";
+            lang = Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride;
+            if (string.IsNullOrEmpty(lang))
+            {
+                var languages = Windows.Globalization.ApplicationLanguages.Languages;
+                lang = languages.Count > 0 ? languages[0] : "en-US";
+            }
+        }
+        catch
+        {
+            // Globalization APIs may not be available in unpackaged/self-contained mode
+            lang = System.Globalization.CultureInfo.CurrentUICulture.Name;
+            if (string.IsNullOrEmpty(lang)) lang = "en-US";
         }
         var rtlLanguages = new[] { "ar", "he", "fa", "ur" };
         var prefix = lang.Split('-')[0].ToLowerInvariant();

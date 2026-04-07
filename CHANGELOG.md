@@ -4,6 +4,17 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.1] - 2026-04-07
+
+### Changed
+
+- Switched to unpackaged self-contained deployment (`WindowsPackageType=None`, `WindowsAppSdkSelfContained=true`)
+- Simplified `Program.cs` entry point — removed `Bootstrap.Initialize`/`Shutdown` calls (no longer needed for self-contained apps)
+
+### Fixed
+
+- `ApplyFlowDirection` crash when Globalization APIs are unavailable in unpackaged mode — falls back to `CultureInfo.CurrentUICulture`
+
 ## [0.7.0] - 2026-04-06
 
 ### Added
