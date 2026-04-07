@@ -4,6 +4,18 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.2] - 2026-04-07
+
+### Changed
+
+- Downgraded Appium.WebDriver from v5.0.0 to v4.4.5 to resolve W3C/JSONWP protocol mismatch with WinAppDriver 1.2
+- Rewrote `AppiumTestBase` for local WinAppDriver execution — auto-starts WinAppDriver, launches app via `Process.Start`, attaches via `appTopLevelWindow` capability
+- Migrated all element helpers from Appium v5 API (`AppiumElement`, `MobileBy`) to v4 API (`WindowsElement`, `FindElementByAccessibilityId`)
+- Added `ClickViewMenu100Percent()` helper using XPath `//MenuItem[@Name='100%']` to avoid `LayerOpacityText` name collision
+- Added `EnsureCleanState` `[TestInitialize]` to dismiss stale dialogs/menus between tests
+- Enhanced `DismissDialog` with Cancel button detection for native file dialogs
+- Enhanced `ClickMenuItem` with 3-attempt retry loop for flyout timing issues
+
 ## [0.7.1] - 2026-04-07
 
 ### Changed
