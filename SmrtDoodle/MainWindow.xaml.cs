@@ -90,6 +90,32 @@ public sealed partial class MainWindow : Window
         _ = CheckLicenseAsync();
         _undoManager.StateChanged += (_, _) => UpdateUndoRedoState();
         _undoManager.StateChanged += (_, _) => MarkDirty();
+
+        // If SmrtPad is already connected (background activation arrived first), enable
+        // the insertion UI immediately; otherwise listen for a later attach.
+        ApplySmrtPadBridgeUi();
+        SmrtPadBridgeSession.Ready += (_, _) => DispatcherQueue.TryEnqueue(ApplySmrtPadBridgeUi);
+
+        Closed += MainWindow_Closed;
+    }
+
+    private void ApplySmrtPadBridgeUi()
+    {
+        if (!SmrtPadBridgeSession.IsActive) return;
+        InsertIntoDocumentItem.Visibility = Visibility.Visible;
+        InsertButton.Visibility = Visibility.Visible;
+        Title = "SmrtDoodle - Insert into SmrtPad";
+    }
+
+    private bool _bridgeResultSent;
+
+    private async void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+        if (SmrtPadBridgeSession.IsActive && !_bridgeResultSent)
+        {
+            // User closed without inserting — let SmrtPad release its waiter.
+            await SmrtPadBridgeSession.SendCancelAsync();
+        }
     }
 
     private async Task CheckLicenseAsync()
@@ -852,10 +878,30 @@ public sealed partial class MainWindow : Window
         var composite = FileService.ComposeLayers(DrawingCanvas, _layers, _settings.Width, _settings.Height, _settings.Dpi, _settings.BackgroundColor);
         try
         {
-            await _fileService.SaveToTempFileAsync(composite, tempPath);
-            // Try to notify via named pipe; fall back to file-based IPC
-            await _ipcService.NotifyImageReadyAsync(tempPath);
-            Close();
+            if (SmrtPadBridgeSession.IsActive)
+            {
+                // Encode the composite to PNG in-memory and ship it back over the AppService bridge
+                // so SmrtPad can insert without ever touching the filesystem.
+                using var ras = new Windows.Storage.Streams.InMemoryRandomAccessStream();
+                await composite.SaveAsync(ras, Microsoft.Graphics.Canvas.CanvasBitmapFileFormat.Png);
+                ras.Seek(0);
+                var bytes = new byte[ras.Size];
+                using (var reader = new Windows.Storage.Streams.DataReader(ras))
+                {
+                    await reader.LoadAsync((uint)ras.Size);
+                    reader.ReadBytes(bytes);
+                }
+
+                _bridgeResultSent = await SmrtPadBridgeSession.SendImageAsync(bytes);
+                Close();
+            }
+            else
+            {
+                await _fileService.SaveToTempFileAsync(composite, tempPath);
+                // Try to notify via named pipe; fall back to file-based IPC
+                await _ipcService.NotifyImageReadyAsync(tempPath);
+                Close();
+            }
         }
         finally { composite.Dispose(); }
     }
