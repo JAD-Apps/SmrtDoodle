@@ -4,6 +4,23 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.9.5] - 2026-05-01
+
+### Added
+- **SmrtPad bridge integration** — SmrtDoodle now supports protocol activation via `smrtdoodle://edit?pipe=…&v=1`; when launched by SmrtPad it connects to a per-session named pipe, receives an optional source PNG frame, and returns the rendered drawing back to SmrtPad when the user finishes
+- **`SmrtPadBridgeSession`** service — manages the named-pipe client connection, exposes `IncomingImagePng` for pre-loading the canvas, and provides `SendImageAsync` / `SendCancelAsync` for the result handoff
+- **`App.xaml.cs` protocol activation** — `OnLaunched` inspects `AppInstance.GetCurrent().GetActivatedEventArgs()`, detects protocol-scheme `smrtdoodle`, parses the query string, and starts the bridge session before the main window opens
+- **Bridge-aware insertion UI** — when launched from SmrtPad, the **Insert into SmrtPad** button appears in the toolbar; clicking it sends the composited canvas PNG back via the bridge and closes the window; closing the window without inserting sends a cancel frame so SmrtPad can clean up
+
+### Changed
+- **`SmrtDoodle.csproj`** — added `<ProjectReference>` to `SmrtAI.Core` for the shared IPC contract and frame serializer
+- **`MainWindow.xaml.cs`** — bridge-aware close handler sends a cancel frame if the result has not already been sent; non-bridge close path is unchanged
+
+### Packaging
+- Version bumped from `0.7.5.0` → `0.9.5.0` in `SmrtDoodle (Package)/Package.appxmanifest`
+
+---
+
 ## [0.7.5] - 2026-04-07
 
 ### Fixed

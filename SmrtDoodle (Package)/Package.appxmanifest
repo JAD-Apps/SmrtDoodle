@@ -12,7 +12,7 @@
   <Identity
     Name="f7664df1-dcdd-4dd1-b6f7-fdcca16a8206"
     Publisher="CN=2B43AD1A-273D-402E-A9A5-FF23C52C75B9, O=JAD Apps"
-    Version="0.5.0.0" />
+    Version="0.9.5.0" />
 
   <mp:PhoneIdentity PhoneProductId="f7664df1-dcdd-4dd1-b6f7-fdcca16a8206" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
