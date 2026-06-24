@@ -18,14 +18,12 @@ public class CurveTool : ToolBase
 
     private readonly List<Vector2> _points = new();
     private Vector2 _currentPoint;
-    private bool _hasFirstPoint;
 
     public override void OnPointerPressed(CanvasDrawingSession ds, Vector2 point, Color color, float strokeWidth)
     {
         base.OnPointerPressed(ds, point, color, strokeWidth);
         _points.Add(point);
         _currentPoint = point;
-        _hasFirstPoint = true;
     }
 
     public override void OnPointerMoved(CanvasDrawingSession ds, Vector2 point, Color color, float strokeWidth)
@@ -48,7 +46,6 @@ public class CurveTool : ToolBase
         {
             DrawCurve(ds, color, strokeWidth);
             _points.Clear();
-            _hasFirstPoint = false;
         }
 
         base.OnPointerReleased(ds, point, color, strokeWidth);
@@ -115,6 +112,5 @@ public class CurveTool : ToolBase
     {
         base.Reset();
         _points.Clear();
-        _hasFirstPoint = false;
     }
 }

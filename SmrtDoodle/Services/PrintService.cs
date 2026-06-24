@@ -24,7 +24,6 @@ public class PrintService
     private readonly Models.CanvasSettings _settings;
     private PrintDocument? _printDocument;
     private IPrintDocumentSource? _printDocumentSource;
-    private Canvas? _printPage;
 
     public enum PrintScaleMode
     {
