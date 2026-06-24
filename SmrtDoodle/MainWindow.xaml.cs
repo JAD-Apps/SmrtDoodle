@@ -69,10 +69,6 @@ public sealed partial class MainWindow : Window
     private readonly DirtyRectTracker _dirtyTracker = new();
     private readonly RenderThrottler _renderThrottler = new(60);
 
-    // File tracking
-    private string? _currentFilePath;
-    private bool _isDirty;
-
     // Color palette
     private readonly List<SolidColorBrush> _paletteColors = new();
 
@@ -151,16 +147,24 @@ public sealed partial class MainWindow : Window
 
     private void MarkDirty()
     {
-        _isDirty = true;
+        _fileService.HasUnsavedChanges = true;
         UpdateTitle();
     }
 
     private void UpdateTitle()
     {
-        var name = string.IsNullOrEmpty(_currentFilePath)
+        // In SmrtPad bridge mode the title is a fixed mode hint, not a file name.
+        if (SmrtPadBridgeSession.IsActive || _ipcService.IsLaunchedFromSmrtPad)
+        {
+            Title = "SmrtDoodle - Insert into SmrtPad";
+            return;
+        }
+
+        var path = _fileService.CurrentFilePath;
+        var name = string.IsNullOrEmpty(path)
             ? "Untitled"
-            : System.IO.Path.GetFileName(_currentFilePath);
-        Title = _isDirty ? $"SmrtDoodle - {name} *" : $"SmrtDoodle - {name}";
+            : System.IO.Path.GetFileName(path);
+        Title = _fileService.HasUnsavedChanges ? $"SmrtDoodle - {name} *" : $"SmrtDoodle - {name}";
     }
 
     private void ParseLaunchArgs()
@@ -769,7 +773,7 @@ public sealed partial class MainWindow : Window
         _fileService.HasUnsavedChanges = false;
         InitializeCanvas(DrawingCanvas);
         DrawingCanvas.Invalidate();
-        Title = "SmrtDoodle";
+        UpdateTitle();
     }
 
     private async void Open_Click(object sender, RoutedEventArgs e)
@@ -798,7 +802,7 @@ public sealed partial class MainWindow : Window
 
         _fileService.CurrentFilePath = file.Path;
         _fileService.HasUnsavedChanges = false;
-        Title = $"SmrtDoodle - {file.Name}";
+        UpdateTitle();
         RefreshLayerList();
         UpdateCanvasSize();
         DrawingCanvas.Invalidate();
@@ -813,6 +817,7 @@ public sealed partial class MainWindow : Window
             {
                 var file = await Windows.Storage.StorageFile.GetFileFromPathAsync(_fileService.CurrentFilePath);
                 await _fileService.SaveImageAsync(composite, file);
+                UpdateTitle();
             }
             finally { composite.Dispose(); }
         }
@@ -830,7 +835,7 @@ public sealed partial class MainWindow : Window
         try
         {
             await _fileService.SaveImageAsync(composite, file);
-            Title = $"SmrtDoodle - {file.Name}";
+            UpdateTitle();
         }
         finally { composite.Dispose(); }
     }

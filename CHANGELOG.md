@@ -4,6 +4,13 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Fixed
+- **Window title no longer drops the file name after editing** — opening or saving a file now keeps the file name in the title bar through subsequent edits. Previously the title and the unsaved-changes asterisk were driven by an internal `_isDirty`/`_currentFilePath` pair that was never assigned, so the first edit after opening a file reset the title to `Untitled *` and the asterisk was tracked independently of the real save state. The title now derives from `FileService` (the single source of truth for the current path and unsaved-changes flag) and stays in sync on New / Open / Save / Save As; SmrtPad bridge sessions keep their `Insert into SmrtPad` mode hint.
+
+---
+
 ## [0.9.5] - 2026-05-01
 
 ### Added
