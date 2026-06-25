@@ -4,7 +4,10 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.9.6] - 2026-06-24
+## [0.9.6] - 2026-06-25
+
+### Security
+- **Updated `Magick.NET-Q16-AnyCPU` / `Magick.NET.Core` from `14.11.1` to `14.14.0`** — clears all outstanding NuGet audit advisories (NU1901/NU1902/NU1903, including high-severity ImageMagick CVEs) that were flagged against 14.11.1. The AnyCPU Q16 variant is retained. Verified: clean build with zero warnings, `dotnet list package --vulnerable` reports no vulnerable packages, the full unit suite passes, and real PSD / TIFF / WebP encode-decode round-trips are pixel-verified against the new native library.
 
 ### Fixed
 - **Window title no longer drops the file name after editing** — opening or saving a file now keeps the file name in the title bar through subsequent edits. Previously the title and the unsaved-changes asterisk were driven by an internal `_isDirty`/`_currentFilePath` pair that was never assigned, so the first edit after opening a file reset the title to `Untitled *` and the asterisk was tracked independently of the real save state. The title now derives from `FileService` (the single source of truth for the current path and unsaved-changes flag) and stays in sync on New / Open / Save / Save As; SmrtPad bridge sessions keep their `Insert into SmrtPad` mode hint.
