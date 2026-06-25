@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Removed two never-read private fields flagged by the compiler (`PrintService._printPage`, `CurveTool._hasFirstPoint`), clearing warnings CS0169 and CS0414. No behavior change.
 
 ### Packaging
+- **Fixed the MSIX package build**, which previously failed before producing a package:
+  - `Package.appxmanifest` referenced `Images\SmallTile.png` / `Images\LargeTile.png` for the Square71x71 / Square310x310 tiles, but no such assets existed in any scale (error APPX0703). Renamed those two references to the standard `Square71x71Logo.png` / `Square310x310Logo.png` — matching the manifest's other four logos and the names produced by `Generate-StoreAssets.ps1` — and added the missing `scale-200` tile assets to `Images/` and to the packaging project's payload (`<Content>`).
+  - The shared `SmrtAI.Core` dependency now declares `RuntimeIdentifiers` (`win-x64;win-x86;win-arm64`) so the self-contained MSIX publish can restore it for the target RID; without this the package build failed with NETSDK1047 whenever the project had last been restored without a RID (the normal state after any plain build or test).
+  - Verified end-to-end: `SmrtDoodle (Package)_0.9.6.0_x64.msix` now builds cleanly (0 errors) via the standard restore-then-build path.
 - Version bumped from `0.9.5.0` → `0.9.6.0` in `SmrtDoodle (Package)/Package.appxmanifest`
 
 ---
