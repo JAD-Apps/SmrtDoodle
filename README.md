@@ -11,6 +11,13 @@ A professional image editor built with **WinUI 3** and **Win2D** for Windows.
 
 SmrtDoodle provides a familiar, intuitive canvas for sketches, diagrams, photo editing, and digital painting — with full layer support, 25 Photoshop-compatible blend modes, AI-powered tools, and extensive file format support including PSD.
 
+## Download
+
+Grab the latest portable build from [Releases](https://github.com/John-Donnelly/SmrtDoodle/releases/latest) — unzip and run `SmrtDoodle.exe`. Self-contained, so no .NET runtime is needed.
+
+> Builds are currently unsigned; Windows SmartScreen will warn on first run.
+> Choose **More info** → **Run anyway** if you trust the source.
+
 ## Features
 
 ### Drawing & Painting
@@ -57,13 +64,6 @@ SmrtDoodle provides a familiar, intuitive canvas for sketches, diagrams, photo e
 - **Drag & Drop** — Drop image files onto the canvas to open them
 - **Color Palette** — 28-color MS Paint-standard palette with primary/secondary swatches and swap button
 - **Ribbon Toolbar** — SmrtPad-style grouped ribbon with Fluent Design theming
-
-## Download
-
-Grab the latest portable build from [Releases](https://github.com/John-Donnelly/SmrtDoodle/releases/latest) — unzip and run `SmrtDoodle.exe`. Self-contained, so no .NET runtime is needed.
-
-> Builds are currently unsigned; Windows SmartScreen will warn on first run.
-> Choose **More info** → **Run anyway** if you trust the source.
 
 ## Requirements
 
