@@ -73,6 +73,21 @@ dotnet build -p:Platform=x64
 
 Or press **F5** in Visual Studio with the packaging project set as the startup project.
 
+### The SmrtPad bridge (optional)
+
+SmrtDoodle can be launched by SmrtPad over a `smrtdoodle://` handover so a drawing
+can be inserted straight into a document. That path depends on `SmrtAI.Core`, which
+lives in the [SmrtPad](https://github.com/John-Donnelly/SmrtPad) repository, so it is
+compiled out by default and SmrtDoodle builds standalone. To build with it:
+
+```
+git clone https://github.com/John-Donnelly/SmrtPad.git ../SmrtPad
+dotnet build SmrtDoodle/SmrtDoodle.csproj -p:Platform=x64 -p:EnableSmrtPadBridge=true
+```
+
+Without the flag the bridge entry points compile against an inert stub, so the
+Insert-into-SmrtPad affordances simply never appear.
+
 ## Running Tests
 
 Unit tests run locally:

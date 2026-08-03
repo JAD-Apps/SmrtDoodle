@@ -22,7 +22,23 @@
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- The SmrtPad bridge (smrtdoodle:// protocol handover) needs SmrtAI.Core,
+       which lives in the SmrtPad repository alongside this one. That path only
+       resolves on a machine with both repos checked out as siblings, so the
+       bridge is opt-in and SmrtDoodle builds standalone by default.
+
+       To build with the bridge:
+         git clone https://github.com/John-Donnelly/SmrtPad.git ../SmrtPad
+         dotnet build SmrtDoodle/SmrtDoodle.csproj -p:EnableSmrtPadBridge=true -->
+  <PropertyGroup>
+    <EnableSmrtPadBridge Condition="'$(EnableSmrtPadBridge)' == ''">false</EnableSmrtPadBridge>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(EnableSmrtPadBridge)' == 'true'">
+    <DefineConstants>$(DefineConstants);SMRTPAD_BRIDGE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(EnableSmrtPadBridge)' == 'true'">
     <ProjectReference Include="..\..\SmrtPad\SmrtAI.Core\SmrtAI.Core.csproj" />
   </ItemGroup>
 

@@ -1,3 +1,4 @@
+#if SMRTPAD_BRIDGE
 using SmrtAI.Core.Ipc;
 using System;
 using System.IO.Pipes;
@@ -93,3 +94,40 @@ internal static class SmrtPadBridgeSession
         IsActive = false;
     }
 }
+#else
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace SmrtDoodle.Services;
+
+/// <summary>
+/// Inert stand-in used when the SmrtPad bridge is compiled out (the default).
+/// The bridge needs SmrtAI.Core from the SmrtPad repository; rather than
+/// scatter <c>#if</c> through the UI, the session reports itself permanently
+/// inactive so every call site compiles and no-ops. Build with
+/// <c>-p:EnableSmrtPadBridge=true</c> for the real implementation.
+/// </summary>
+internal static class SmrtPadBridgeSession
+{
+    /// <summary>Always <c>null</c>: no bridge, so no incoming image.</summary>
+    public static byte[]? IncomingImagePng => null;
+
+    /// <summary>Always <c>false</c>: SmrtDoodle was not launched by SmrtPad.</summary>
+    public static bool IsActive => false;
+
+    /// <summary>Never raised while the bridge is compiled out.</summary>
+#pragma warning disable CS0067 // event is intentionally never raised in this build
+    public static event EventHandler? Ready;
+#pragma warning restore CS0067
+
+    public static void Start(string pipeName) { }
+
+    public static Task<bool> SendImageAsync(byte[] png, CancellationToken ct = default)
+        => Task.FromResult(false);
+
+    public static Task SendCancelAsync(CancellationToken ct = default) => Task.CompletedTask;
+
+    public static void Close() { }
+}
+#endif

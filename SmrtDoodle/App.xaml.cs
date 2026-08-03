@@ -1,6 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.Windows.AppLifecycle;
+#if SMRTPAD_BRIDGE
 using SmrtAI.Core.Ipc;
+#endif
 using SmrtDoodle.Services;
 using System;
 using System.Collections.Specialized;
@@ -28,7 +30,9 @@ namespace SmrtDoodle
             if (activation?.Kind == ExtendedActivationKind.Protocol &&
                 activation.Data is IProtocolActivatedEventArgs protocolArgs)
             {
+#if SMRTPAD_BRIDGE
                 TryStartSmrtPadBridge(protocolArgs.Uri);
+#endif
             }
 
             _window = new MainWindow();
@@ -36,6 +40,7 @@ namespace SmrtDoodle
             LoggingService.Instance.Info("Application launched.");
         }
 
+#if SMRTPAD_BRIDGE
         /// <summary>
         /// Honours the <c>smrtdoodle://edit?pipe=...&amp;v=...</c> launch URI from SmrtPad by
         /// connecting to the named-pipe server and seeding <see cref="SmrtPadBridgeSession"/>.
@@ -59,6 +64,7 @@ namespace SmrtDoodle
 
             SmrtPadBridgeSession.Start(pipeName);
         }
+#endif
 
         private void OnUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
