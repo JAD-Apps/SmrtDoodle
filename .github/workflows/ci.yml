@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: build & test
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x64]
+        configuration: [Debug, Release]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: |
+          dotnet restore "SmrtDoodle/SmrtDoodle.csproj"
+          dotnet restore "SmrtDoodle.Tests/SmrtDoodle.Tests.csproj"
+
+      - name: Build
+        run: |
+          dotnet build "SmrtDoodle/SmrtDoodle.csproj" --configuration ${{ matrix.configuration }} --no-restore -p:Platform=${{ matrix.platform }}
+          dotnet build "SmrtDoodle.Tests/SmrtDoodle.Tests.csproj" --configuration ${{ matrix.configuration }} --no-restore -p:Platform=${{ matrix.platform }}
+
+      - name: Test
+        run: dotnet test "SmrtDoodle.Tests/SmrtDoodle.Tests.csproj" --configuration ${{ matrix.configuration }} --no-build -p:Platform=${{ matrix.platform }} --collect:"XPlat Code Coverage" --results-directory ./TestResults --logger trx
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: test-results-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: ./TestResults
