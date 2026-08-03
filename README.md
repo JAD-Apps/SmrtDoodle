@@ -1,5 +1,9 @@
 # SmrtDoodle
 
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4?logo=windows&logoColor=white)
+![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)
+![WinUI 3](https://img.shields.io/badge/WinUI-3-0078D4)
+
 A professional image editor built with **WinUI 3** and **Win2D** for Windows.
 
 SmrtDoodle provides a familiar, intuitive canvas for sketches, diagrams, photo editing, and digital painting — with full layer support, 25 Photoshop-compatible blend modes, AI-powered tools, and extensive file format support including PSD.
