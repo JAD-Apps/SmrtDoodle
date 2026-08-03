@@ -11,6 +11,8 @@
 <img src="docs/media/smrtdoodle-canvas.png" alt="SmrtDoodle with a three-layer composition on the canvas and the Layers panel open, showing named layers with distinct blend modes and opacity values" width="900">
 </p>
 
+**Status:** released and actively developed · **Latest:** v0.9.7 · **Requires:** Windows 10 1809 (build 17763) or later
+
 A professional image editor built with **WinUI 3** and **Win2D** for Windows.
 
 SmrtDoodle provides a familiar, intuitive canvas for sketches, diagrams, photo editing, and digital painting — with full layer support, 25 Photoshop-compatible blend modes, AI-powered tools, and extensive file format support including PSD.
