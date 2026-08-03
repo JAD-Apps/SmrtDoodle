@@ -7,6 +7,10 @@
 [![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/JAD-Apps/SmrtDoodle?label=download&logo=github)](https://github.com/JAD-Apps/SmrtDoodle/releases/latest)
 
+<p align="center">
+<img src="docs/media/smrtdoodle-canvas.png" alt="SmrtDoodle with a three-layer composition on the canvas and the Layers panel open, showing named layers with distinct blend modes and opacity values" width="900">
+</p>
+
 A professional image editor built with **WinUI 3** and **Win2D** for Windows.
 
 SmrtDoodle provides a familiar, intuitive canvas for sketches, diagrams, photo editing, and digital painting — with full layer support, 25 Photoshop-compatible blend modes, AI-powered tools, and extensive file format support including PSD.
@@ -30,6 +34,9 @@ Grab the latest portable build from [Releases](https://github.com/JAD-Apps/SmrtD
 - **Pattern Fill** — Checkerboard, Diagonal Lines, Dots, Crosshatch, and Brick patterns
 
 ### Layers & Compositing
+
+![Painting brush strokes onto the active layer, then selecting a lower layer and dragging its opacity slider, so the composite under the strokes lightens and darkens in response](docs/media/smrtdoodle-drawing.gif)
+
 - **Layer System** — Multiple layers with visibility, opacity, blend modes, grouping, masks, and effects
 - **25 Blend Modes** — Full Photoshop-compatible set: Normal, Dissolve, Multiply, Screen, Overlay, Soft Light, Hard Light, Color Dodge, Color Burn, and more
 - **Layer Effects** — Drop Shadow, Inner Shadow, Outer Glow, and Stroke
