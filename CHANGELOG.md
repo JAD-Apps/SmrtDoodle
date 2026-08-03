@@ -4,6 +4,11 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.9.7] - 2026-08-04
+
+### Fixed
+- **IL trimming disabled** — `PublishTrimmed` was enabled for every non-Debug configuration. WinUI 3 and the Windows App SDK do not support IL trimming: the trimmer strips `ComInterfaceEntry`, which CsWinRT requires at runtime for vtable registration, so a trimmed build can link cleanly and still fail at launch with `TypeLoadException`. Inklet and MarkUp already disable it for this reason. The 0.9.6 release archive was produced with trimming enabled and is superseded by this release.
+
 ## [0.9.6] - 2026-06-25
 
 ### Security

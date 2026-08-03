@@ -56,7 +56,11 @@
   <PropertyGroup>
     <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
     <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
+    <!-- PublishTrimmed is intentionally disabled for all configurations, matching
+         Inklet, MarkUp and SmrtPad. WinUI 3 / Windows App SDK do not support IL
+         trimming: the trimmer strips ComInterfaceEntry, which CsWinRT needs at
+         runtime for vtable registration, so a trimmed build can link cleanly and
+         still fail at launch with TypeLoadException. ReadyToRun is kept. -->
+    <PublishTrimmed>False</PublishTrimmed>
   </PropertyGroup>
 </Project>
