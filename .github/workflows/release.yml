@@ -1,0 +1,91 @@
+name: Release
+
+# Publishes a portable, self-contained Windows build when a version tag is
+# pushed. Builds are unpackaged (no MSIX) and unsigned — SmartScreen will warn
+# on first run until code-signing certificates are in place.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: publish win-${{ matrix.arch }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish
+        run: >
+          dotnet publish "SmrtDoodle/SmrtDoodle.csproj"
+          --configuration Release
+          --runtime win-${{ matrix.arch }}
+          --self-contained true
+          -p:Platform=${{ matrix.arch }}
+          -p:WindowsPackageType=None
+          -p:WindowsAppSdkSelfContained=true
+          --output publish
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          Compress-Archive -Path publish/* -DestinationPath "SmrtDoodle-$tag-win-${{ matrix.arch }}.zip"
+
+      - name: Upload build
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: SmrtDoodle-win-${{ matrix.arch }}
+          path: '*.zip'
+
+  release:
+    name: Publish release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Download builds
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=$(awk '
+            /^## \[Unreleased\]/ { inrel=0; next }
+            /^## \[/ { if (inrel) exit; inrel=1; print; next }
+            inrel { print }
+          ' CHANGELOG.md)
+          {
+            echo "$notes"
+            echo
+            echo "### Download"
+            echo
+            echo "Portable, self-contained build — unzip and run \`SmrtDoodle.exe\`. No installer, no .NET runtime needed."
+            echo
+            echo "> Builds are unsigned; Windows SmartScreen will warn on first run. Choose **More info** -> **Run anyway** if you trust the source."
+          } > notes.md
+          gh release create "${{ github.ref_name }}" dist/*.zip \
+            --repo "${{ github.repository }}" \
+            --title "SmrtDoodle ${{ github.ref_name }}" \
+            --notes-file notes.md
