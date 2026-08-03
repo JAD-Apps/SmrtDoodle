@@ -28,7 +28,7 @@
        bridge is opt-in and SmrtDoodle builds standalone by default.
 
        To build with the bridge:
-         git clone https://github.com/John-Donnelly/SmrtPad.git ../SmrtPad
+         git clone https://github.com/JAD-Apps/SmrtPad.git ../SmrtPad
          dotnet build SmrtDoodle/SmrtDoodle.csproj -p:EnableSmrtPadBridge=true -->
   <PropertyGroup>
     <EnableSmrtPadBridge Condition="'$(EnableSmrtPadBridge)' == ''">false</EnableSmrtPadBridge>

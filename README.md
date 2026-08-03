@@ -1,11 +1,11 @@
 # SmrtDoodle
 
-[![CI](https://github.com/John-Donnelly/SmrtDoodle/actions/workflows/ci.yml/badge.svg)](https://github.com/John-Donnelly/SmrtDoodle/actions/workflows/ci.yml)
+[![CI](https://github.com/JAD-Apps/SmrtDoodle/actions/workflows/ci.yml/badge.svg)](https://github.com/JAD-Apps/SmrtDoodle/actions/workflows/ci.yml)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4?logo=windows&logoColor=white)
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)
 ![WinUI 3](https://img.shields.io/badge/WinUI-3-0078D4)
 [![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/John-Donnelly/SmrtDoodle?label=download&logo=github)](https://github.com/John-Donnelly/SmrtDoodle/releases/latest)
+[![Release](https://img.shields.io/github/v/release/JAD-Apps/SmrtDoodle?label=download&logo=github)](https://github.com/JAD-Apps/SmrtDoodle/releases/latest)
 
 A professional image editor built with **WinUI 3** and **Win2D** for Windows.
 
@@ -13,7 +13,7 @@ SmrtDoodle provides a familiar, intuitive canvas for sketches, diagrams, photo e
 
 ## Download
 
-Grab the latest portable build from [Releases](https://github.com/John-Donnelly/SmrtDoodle/releases/latest) — unzip and run `SmrtDoodle.exe`. Self-contained, so no .NET runtime is needed.
+Grab the latest portable build from [Releases](https://github.com/JAD-Apps/SmrtDoodle/releases/latest) — unzip and run `SmrtDoodle.exe`. Self-contained, so no .NET runtime is needed.
 
 > Builds are currently unsigned; Windows SmartScreen will warn on first run.
 > Choose **More info** → **Run anyway** if you trust the source.
@@ -59,7 +59,7 @@ Grab the latest portable build from [Releases](https://github.com/John-Donnelly/
 
 ### Integration
 - **Printing** — Native print dialog via PrintDocument with Fit to Page, Actual Size, and Custom DPI modes
-- **SmrtPad Integration** — Named-pipe IPC for inserting drawings directly into [SmrtPad](https://github.com/John-Donnelly/SmrtPad) documents
+- **SmrtPad Integration** — Named-pipe IPC for inserting drawings directly into [SmrtPad](https://github.com/JAD-Apps/SmrtPad) documents
 - **Clipboard** — Copy, cut, paste, paste from file, and paste as new image
 - **Drag & Drop** — Drop image files onto the canvas to open them
 - **Color Palette** — 28-color MS Paint-standard palette with primary/secondary swatches and swap button
@@ -85,11 +85,11 @@ Or press **F5** in Visual Studio with the packaging project set as the startup p
 
 SmrtDoodle can be launched by SmrtPad over a `smrtdoodle://` handover so a drawing
 can be inserted straight into a document. That path depends on `SmrtAI.Core`, which
-lives in the [SmrtPad](https://github.com/John-Donnelly/SmrtPad) repository, so it is
+lives in the [SmrtPad](https://github.com/JAD-Apps/SmrtPad) repository, so it is
 compiled out by default and SmrtDoodle builds standalone. To build with it:
 
 ```
-git clone https://github.com/John-Donnelly/SmrtPad.git ../SmrtPad
+git clone https://github.com/JAD-Apps/SmrtPad.git ../SmrtPad
 dotnet build SmrtDoodle/SmrtDoodle.csproj -p:Platform=x64 -p:EnableSmrtPadBridge=true
 ```
 
