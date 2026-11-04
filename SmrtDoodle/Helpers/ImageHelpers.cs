@@ -113,7 +113,7 @@ public static class ImageTransforms
     public static CanvasRenderTarget Resize(ICanvasResourceCreator device, CanvasRenderTarget source,
         int newWidth, int newHeight, float dpi)
     {
-        var result = new CanvasRenderTarget(device, newWidth, newHeight, dpi);
+        var result = new CanvasRenderTarget(device, newWidth, newHeight, 96f);
         using var ds = result.CreateDrawingSession();
         ds.DrawImage(source, new Windows.Foundation.Rect(0, 0, newWidth, newHeight),
             new Windows.Foundation.Rect(0, 0, source.SizeInPixels.Width, source.SizeInPixels.Height));
@@ -123,7 +123,7 @@ public static class ImageTransforms
     public static CanvasRenderTarget Crop(ICanvasResourceCreator device, CanvasRenderTarget source,
         Windows.Foundation.Rect cropRect, float dpi)
     {
-        var result = new CanvasRenderTarget(device, (float)cropRect.Width, (float)cropRect.Height, dpi);
+        var result = new CanvasRenderTarget(device, (float)cropRect.Width, (float)cropRect.Height, 96f);
         using var ds = result.CreateDrawingSession();
         ds.DrawImage(source, new Windows.Foundation.Rect(0, 0, cropRect.Width, cropRect.Height), cropRect);
         return result;
@@ -158,7 +158,7 @@ public static class ImageTransforms
         var newW = w + extraW;
         var newH = h + extraH;
 
-        var result = new CanvasRenderTarget(device, newW, newH, dpi);
+        var result = new CanvasRenderTarget(device, newW, newH, 96f);
         using var ds = result.CreateDrawingSession();
         ds.Clear(Color.FromArgb(0, 0, 0, 0));
 

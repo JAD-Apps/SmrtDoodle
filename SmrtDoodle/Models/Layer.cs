@@ -36,7 +36,9 @@ public class Layer : IDisposable
     public void Initialize(ICanvasResourceCreator resourceCreator, int width, int height, float dpi)
     {
         Bitmap?.Dispose();
-        Bitmap = new CanvasRenderTarget(resourceCreator, width, height, dpi);
+        // Editing coordinates are document pixels. The document DPI is print metadata;
+        // scaling the backing surface by it changes the actual image dimensions.
+        Bitmap = new CanvasRenderTarget(resourceCreator, width, height, 96f);
         using var ds = Bitmap.CreateDrawingSession();
         ds.Clear(Microsoft.UI.Colors.Transparent);
     }
@@ -81,7 +83,7 @@ public class Layer : IDisposable
     public void InitializeMask(ICanvasResourceCreator resourceCreator, int width, int height, float dpi)
     {
         MaskBitmap?.Dispose();
-        MaskBitmap = new CanvasRenderTarget(resourceCreator, width, height, dpi);
+        MaskBitmap = new CanvasRenderTarget(resourceCreator, width, height, 96f);
         using var ds = MaskBitmap.CreateDrawingSession();
         ds.Clear(Microsoft.UI.Colors.White);
         IsMaskEnabled = true;
