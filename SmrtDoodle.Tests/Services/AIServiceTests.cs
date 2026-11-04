@@ -50,11 +50,11 @@ public class AIServiceTests
     }
 
     [TestMethod]
-    public void EnsureProLicense_ThrowsWhenNotLicensed()
+    public async Task EnsureProLicense_ThrowsWhenNotLicensed()
     {
         var svc = new AIService();
         // All async methods should throw when not licensed
-        Assert.ThrowsExceptionAsync<InvalidOperationException>(
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(
             () => svc.RemoveBackgroundAsync(null!, null!));
     }
 }
