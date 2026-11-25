@@ -192,7 +192,14 @@ public static class FormatConversionService
     {
         using var collection = new MagickImageCollection();
 
-        foreach (var layer in layers)
+        var firstBitmap = layers.FirstOrDefault(layer => layer.Bitmap != null)?.Bitmap
+            ?? throw new InvalidOperationException("There are no drawing layers to export.");
+        using var composite = FileService.ComposeLayers(firstBitmap.Device, layers,
+            width, height, dpi, backgroundColor);
+        collection.Add(RenderTargetToMagickImage(composite, width, height));
+
+        // PSD stores its composite first and its drawing layers from top to bottom.
+        foreach (var layer in layers.Reverse())
         {
             if (layer.Bitmap == null) continue;
 
@@ -248,15 +255,16 @@ public static class FormatConversionService
     /// <summary>
     /// Copies pixel data from a MagickImage into a Win2D CanvasRenderTarget.
     /// </summary>
-    private static void CopyMagickToRenderTarget(IMagickImage image, CanvasRenderTarget target,
+    private static void CopyMagickToRenderTarget(IMagickImage<ushort> image, CanvasRenderTarget target,
         int width, int height)
     {
         // Convert MagickImage to RGBA byte array, then set pixel colors on the target
         image.Alpha(AlphaOption.Set);
 
         // Export as raw RGBA bytes (8-bit per channel regardless of Q16)
-        var settings = new PixelReadSettings((uint)width, (uint)height, StorageType.Char, PixelMapping.RGBA);
-        var rawBytes = image.ToByteArray(MagickFormat.Rgba);
+        using var pixels = image.GetPixels();
+        var rawBytes = pixels.ToByteArray(PixelMapping.RGBA)
+            ?? throw new InvalidDataException("The image did not contain readable RGBA pixels.");
 
         var colors = new Color[width * height];
         for (int i = 0; i < colors.Length; i++)

@@ -36,7 +36,7 @@ public abstract class AppiumTestBase
                 return candidate;
             dir = Path.GetDirectoryName(dir);
         }
-        return @"B:\Source\repos\SmrtDoodle\SmrtDoodle\bin\x64\Debug\net8.0-windows10.0.19041.0\SmrtDoodle.exe";
+        throw new FileNotFoundException("Set the AppPath run setting to the review build of SmrtDoodle.exe.");
     }
 
     /// <summary>
@@ -95,30 +95,27 @@ public abstract class AppiumTestBase
             EnsureWinAppDriverRunning();
         }
 
-        // Kill any existing SmrtDoodle instances to start fresh
+        // Never terminate another instance: it may contain an unsaved drawing.
         foreach (var proc in Process.GetProcessesByName("SmrtDoodle"))
         {
-            try { proc.Kill(); proc.WaitForExit(3000); } catch { }
+            using (proc)
+            {
+                if (!proc.HasExited)
+                    throw new InvalidOperationException(
+                        "Close existing SmrtDoodle windows before running UI tests. No running app was terminated.");
+            }
         }
 
         var appiumUrl = new Uri($"http://{appiumHost}:{appiumPort}");
 
-        var appCandidates = new[]
-        {
-            configuredAppPath,
-            GetDefaultAppPath(),
-            @"C:\SmrtDoodle-Test\SmrtDoodle.exe",
-            @"C:\SmrtDoodle\SmrtDoodle.exe",
-        }.Distinct(StringComparer.OrdinalIgnoreCase).Where(File.Exists).ToList();
-
-        if (appCandidates.Count == 0)
+        if (!Path.IsPathFullyQualified(configuredAppPath) || !File.Exists(configuredAppPath))
         {
             throw new FileNotFoundException(
-                "SmrtDoodle.exe not found at any expected path. Build the project first.");
+                "The selected SmrtDoodle.exe was not found. Set AppPath to the review build.", configuredAppPath);
         }
 
         // Launch the app manually
-        var exePath = appCandidates[0];
+        var exePath = configuredAppPath;
         _appProcess = Process.Start(new ProcessStartInfo(exePath) { UseShellExecute = false });
         if (_appProcess is null || _appProcess.HasExited)
             throw new InvalidOperationException($"Failed to start SmrtDoodle from {exePath}");
@@ -174,12 +171,6 @@ public abstract class AppiumTestBase
             try { _appProcess.Kill(); _appProcess.WaitForExit(3000); } catch { }
         }
         _appProcess = null;
-
-        // Kill any remaining SmrtDoodle instances
-        foreach (var proc in Process.GetProcessesByName("SmrtDoodle"))
-        {
-            try { proc.Kill(); } catch { }
-        }
 
         // Stop WinAppDriver if we started it
         if (_winAppDriverProcess is not null && !_winAppDriverProcess.HasExited)

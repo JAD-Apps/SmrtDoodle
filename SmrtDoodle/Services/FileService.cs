@@ -117,7 +117,7 @@ public class FileService
     public static CanvasRenderTarget ComposeLayers(ICanvasResourceCreator device, IList<Layer> layers,
         int width, int height, float dpi, Windows.UI.Color backgroundColor)
     {
-        var composite = new CanvasRenderTarget(device, width, height, dpi);
+        var composite = new CanvasRenderTarget(device, width, height, 96f);
         using (var ds = composite.CreateDrawingSession())
         {
             ds.Clear(backgroundColor);

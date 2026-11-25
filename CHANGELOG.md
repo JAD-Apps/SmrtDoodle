@@ -4,6 +4,15 @@ All notable changes to SmrtDoodle will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Fixed
+- Preserve document pixel dimensions when the print resolution is 72 or 300 DPI, including layer masks, selections, resizing and cropping.
+- Flush native project image streams before reopening them.
+- Convert Q16 image data to eight-bit RGBA correctly when importing TIFF and Photoshop files.
+- Write a separate Photoshop composite and preserve both drawing layers in the correct order.
+- Await asynchronous licence assertions and prevent UI tests from terminating another editor session.
+
 ## [0.9.7] - 2026-08-04
 
 ### Fixed

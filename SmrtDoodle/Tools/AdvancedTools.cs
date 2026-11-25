@@ -348,7 +348,7 @@ public class SelectionTool : ToolBase
         if (SelectionBitmap != null || SelectionRect.Width < 1 || SelectionRect.Height < 1) return;
 
         var device = sourceBitmap.Device;
-        SelectionBitmap = new CanvasRenderTarget(device, (float)SelectionRect.Width, (float)SelectionRect.Height, dpi);
+        SelectionBitmap = new CanvasRenderTarget(device, (float)SelectionRect.Width, (float)SelectionRect.Height, 96f);
         using (var sds = SelectionBitmap.CreateDrawingSession())
         {
             sds.DrawImage(sourceBitmap,

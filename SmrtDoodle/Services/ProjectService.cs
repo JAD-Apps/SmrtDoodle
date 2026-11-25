@@ -167,7 +167,9 @@ public static class ProjectService
             {
                 using var bitmapStream = bitmapEntry.Open();
                 using var randomAccess = new InMemoryRandomAccessStream();
-                await bitmapStream.CopyToAsync(randomAccess.AsStreamForWrite());
+                using var writeStream = randomAccess.AsStreamForWrite();
+                await bitmapStream.CopyToAsync(writeStream);
+                await writeStream.FlushAsync();
                 randomAccess.Seek(0);
 
                 var loadedBitmap = await CanvasBitmap.LoadAsync(device, randomAccess);
